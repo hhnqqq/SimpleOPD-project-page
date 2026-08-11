@@ -1,18 +1,18 @@
 // 语言切换功能
 document.addEventListener('DOMContentLoaded', () => {
   const langSwitch = document.getElementById("lang-switch");
-  
+
   if (!langSwitch || typeof translations === 'undefined') return;
-  
+
   langSwitch.addEventListener("click", (e) => {
     const target = e.target.closest(".lang-option");
     if (!target) return;
-    
+
     const lang = target.dataset.lang;
     document.querySelectorAll(".lang-option").forEach(opt => opt.classList.remove("active"));
     target.classList.add("active");
     document.documentElement.lang = lang;
-    
+
     if (lang === "zh") {
       applyTranslations(translations.zh);
     } else {
@@ -22,147 +22,245 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function applyTranslations(t) {
-  // Hero
-  const tagline = document.querySelector(".hero-tagline");
-  if (tagline && t.heroTagline) tagline.innerHTML = t.heroTagline;
-  
-  const affil = document.querySelector(".hero-affil");
-  if (affil && t.heroAffil) affil.textContent = t.heroAffil;
-  
-  // Metrics
-  const metrics = document.querySelectorAll(".metric");
-  if (metrics[0]) {
-    const unit = metrics[0].querySelector(".metric-unit");
-    const label = metrics[0].querySelector(".metric-label");
-    if (unit && t.metricStudents) unit.textContent = t.metricStudents;
-    if (label && t.metricStudentsLabel) label.textContent = t.metricStudentsLabel;
-  }
-  if (metrics[1]) {
-    const unit = metrics[1].querySelector(".metric-unit");
-    const label = metrics[1].querySelector(".metric-label");
-    if (unit && t.metricGain) unit.textContent = t.metricGain;
-    if (label && t.metricGainLabel) label.textContent = t.metricGainLabel;
-  }
-  if (metrics[2]) {
-    const unit = metrics[2].querySelector(".metric-unit");
-    const label = metrics[2].querySelector(".metric-label");
-    if (unit && t.metricAlign) unit.textContent = t.metricAlign;
-    if (label && t.metricAlignLabel) label.textContent = t.metricAlignLabel;
-  }
-  
-  // Section titles and subs
-  const titleMap = [
-    [".tldr .section-head h2", "tldrTitle"],
-    [".takeaways .section-head h2", "takeawayTitle"],
-    [".method .section-head h2", "methodTitle"],
-    [".method .section-sub", "methodIntro"],
-    [".setup .section-head h2", "setupTitle"],
-    [".results .section-head h2", "resultsTitle"],
-    [".results .section-sub", "resultsSub"],
-    [".analysis .section-head h2", "whyTitle"],
-    [".summary .section-head h2", "summaryTitle"],
-    [".citation .section-head h2", "citationTitle"]
+  const setText = (el, v) => { if (el && v != null) el.textContent = v; };
+  const setHTML = (el, v) => { if (el && v != null) el.innerHTML = v; };
+  const setEach = (els, fn) => els.forEach((el, i) => fn(el, i));
+
+  // ── 页面标题 ──
+  if (t.pageTitle) document.title = t.pageTitle;
+
+  // ── 导航栏 ──
+  setEach(document.querySelectorAll(".nav-links a"), (el, i) => {
+    setText(el, Object.values(t.nav)[i]);
+  });
+  setText(document.querySelector(".nav-cta"), t.nav.paper);
+
+  // ── Hero ──
+  const badge = document.querySelector(".hero-badge");
+  if (badge && t.hero.badge) badge.innerHTML = '<span class="badge-dot"></span> ' + t.hero.badge;
+  setHTML(document.querySelector(".hero-title-sub"), t.hero.titleSub);
+  setHTML(document.querySelector(".hero-tagline"), t.hero.tagline);
+  setHTML(document.querySelector(".hero-affil"), t.hero.affil);
+
+  const primaryBtn = document.querySelector(".btn-primary span");
+  if (primaryBtn && t.hero.btnRead) primaryBtn.textContent = t.hero.btnRead;
+  setEach(document.querySelectorAll(".btn-ghost"), (el, i) => {
+    if (i === 0) setText(el, t.hero.btnCite);
+    if (i === 1 && t.hero.btnKeyResults) el.innerHTML = '<span class="btn-spark">✦</span> ' + t.hero.btnKeyResults;
+  });
+
+  setEach(document.querySelectorAll(".metric"), (el, i) => {
+    const m = t.hero.metrics[i];
+    if (!m) return;
+    setText(el.querySelector(".metric-unit"), m[0]);
+    setText(el.querySelector(".metric-label"), m[1]);
+  });
+
+  // ── 章节标题 ──
+  const overlineMap = [
+    [".tldr .overline", "tldr"],
+    [".takeaways .overline", "takeaways"],
+    [".method .overline", "method"],
+    [".setup .overline", "setup"],
+    [".results .overline", "results"],
+    [".analysis .overline", "analysis"],
+    [".conclusion .overline", "conclusion"],
+    [".citation .overline", "citation"]
   ];
-  
-  titleMap.forEach(([sel, key]) => {
-    const el = document.querySelector(sel);
-    if (el && t[key]) el.textContent = t[key];
+  overlineMap.forEach(([sel, key]) => setText(document.querySelector(sel), t[key].overline));
+
+  const titleMap = [
+    [".tldr .section-head h2", "tldr"],
+    [".takeaways .section-head h2", "takeaways"],
+    [".method .section-head h2", "method"],
+    [".setup .section-head h2", "setup"],
+    [".results .section-head h2", "results"],
+    [".analysis .section-head h2", "analysis"],
+    [".conclusion .section-head h2", "conclusion"],
+    [".citation .section-head h2", "citation"]
+  ];
+  titleMap.forEach(([sel, key]) => setText(document.querySelector(sel), t[key].title));
+
+  setText(document.querySelector(".method .section-sub"), t.method.intro);
+  setText(document.querySelector(".results .section-sub"), t.results.sub);
+
+  // ── TL;DR ──
+  setEach(document.querySelectorAll(".tldr-card p"), (el, i) => setHTML(el, t.tldr["p" + (i + 1)]));
+
+  // ── Takeaways ──
+  setEach(document.querySelectorAll(".takeaway-card"), (el, i) => {
+    const card = t.takeaways.cards[i];
+    if (!card) return;
+    setText(el.querySelector("h3"), card.title);
+    setText(el.querySelector("p"), card.desc);
   });
-  
-  // TL;DR
-  const tldrPs = document.querySelectorAll(".tldr-card p");
-  if (tldrPs[0] && t.tldrP1) tldrPs[0].innerHTML = t.tldrP1;
-  if (tldrPs[1] && t.tldrP2) tldrPs[1].innerHTML = t.tldrP2;
-  if (tldrPs[2] && t.tldrP3) tldrPs[2].innerHTML = t.tldrP3;
-  
-  // Takeaways
-  const tkCards = document.querySelectorAll(".takeaway-card");
-  [
-    ["tk1Title", "tk1Desc"],
-    ["tk2Title", "tk2Desc"],
-    ["tk3Title", "tk3Desc"],
-    ["tk4Title", "tk4Desc"]
-  ].forEach(([titleKey, descKey], i) => {
-    if (tkCards[i]) {
-      const h3 = tkCards[i].querySelector("h3");
-      const p = tkCards[i].querySelector("p");
-      if (h3 && t[titleKey]) h3.textContent = t[titleKey];
-      if (p && t[descKey]) p.textContent = t[descKey];
-    }
+
+  // ── Method ──
+  setHTML(document.querySelector(".method .figure-card figcaption .fig-badge"), t.method.figBadge);
+  const methodFigCaption = document.querySelector(".method figure figcaption");
+  if (methodFigCaption) {
+    const badge = methodFigCaption.querySelector(".fig-badge");
+    setHTML(methodFigCaption, (badge ? badge.outerHTML : "") + t.method.figCaption);
+  }
+
+  setEach(document.querySelectorAll(".method-block"), (blk, i) => {
+    const block = t.method.blocks[i];
+    if (!block) return;
+    setText(blk.querySelector("h3"), block.title);
+    setEach(blk.querySelectorAll("p"), (p, j) => setHTML(p, block.ps[j]));
   });
-  
-  // Setup cards
+
+  // 算法 1
+  const algoTitle = document.querySelector(".algorithm-title");
+  if (algoTitle) {
+    const badge = algoTitle.querySelector(".fig-badge");
+    setHTML(algoTitle, (badge ? badge.outerHTML : "") + t.method.algoTitle);
+  }
+  setText(document.querySelector(".algorithm-title .fig-badge"), t.method.algoBadge);
+  setEach(document.querySelectorAll(".algorithm-body li"), (li, i) => setHTML(li, t.method.algoLines[i]));
+
+  // 稳定化卡片
+  setEach(document.querySelectorAll(".stab-card"), (el, i) => {
+    const card = t.method.stab[i];
+    if (!card) return;
+    setText(el.querySelector("h4"), card.title);
+    setHTML(el.querySelector("p"), card.desc);
+  });
+
+  // ── Setup ──
   const setupCards = document.querySelectorAll(".setup-card");
   if (setupCards[0]) {
-    const h3 = setupCards[0].querySelector("h3");
-    const p = setupCards[0].querySelector("p");
-    if (h3 && t.setupTeacherTitle) h3.textContent = t.setupTeacherTitle;
-    if (p && t.setupTeacherDesc) p.innerHTML = t.setupTeacherDesc;
+    setHTML(setupCards[0].querySelector("h3"), t.setup.teacherTitle);
+    setHTML(setupCards[0].querySelector("p"), t.setup.teacherDesc);
+    setEach(setupCards[0].querySelectorAll(".setup-tags li"), (li, i) => setText(li, t.setup.teacherTags[i]));
   }
   if (setupCards[1]) {
-    const h3 = setupCards[1].querySelector("h3");
-    const p = setupCards[1].querySelector("p");
-    if (h3 && t.setupStudentTitle) h3.textContent = t.setupStudentTitle;
-    if (p && t.setupStudentDesc) p.innerHTML = t.setupStudentDesc;
+    setText(setupCards[1].querySelector("h3"), t.setup.studentTitle);
+    setHTML(setupCards[1].querySelector("p"), t.setup.studentDesc);
+    setEach(setupCards[1].querySelectorAll(".student-list li"), (li, i) => {
+      const chip = li.querySelector(".student-chip");
+      const label = t.setup.studentLabels[i];
+      if (chip && label != null) li.innerHTML = chip.outerHTML + " " + label;
+    });
   }
   if (setupCards[2]) {
-    const h3 = setupCards[2].querySelector("h3");
-    if (h3 && t.setupDataTitle) h3.textContent = t.setupDataTitle;
+    setText(setupCards[2].querySelector("h3"), t.setup.dataTitle);
+    setEach(setupCards[2].querySelectorAll(".data-item"), (item, i) => {
+      const d = t.setup.dataItems[i];
+      if (!d) return;
+      setText(item.querySelector(".data-name"), d[0]);
+      setText(item.querySelector(".data-desc"), d[1]);
+    });
   }
   if (setupCards[3]) {
-    const h3 = setupCards[3].querySelector("h3");
-    const p = setupCards[3].querySelector("p");
-    if (h3 && t.setupEvalTitle) h3.textContent = t.setupEvalTitle;
-    if (p && t.setupEvalDesc) p.textContent = t.setupEvalDesc;
+    setText(setupCards[3].querySelector("h3"), t.setup.configTitle);
+    setEach(setupCards[3].querySelectorAll(".config-key"), (k, i) => setText(k, t.setup.configKeys[i]));
+    setHTML(setupCards[3].querySelector(".config-note"), t.setup.configNote);
   }
-  
-  // Results blocks (h3 titles)
-  const resultsH3 = document.querySelectorAll(".results h3");
-  if (resultsH3[0] && t.resultsBlock1Title) resultsH3[0].innerHTML = t.resultsBlock1Title;
-  if (resultsH3[1] && t.resultsBlock2Title) resultsH3[1].innerHTML = t.resultsBlock2Title;
-  if (resultsH3[2] && t.resultsBlock3Title) resultsH3[2].innerHTML = t.resultsBlock3Title;
-  
-  // Results paragraphs
-  const resultsPs = document.querySelectorAll(".results .prose p");
-  if (resultsPs[0] && t.resultsBlock1P) resultsPs[0].innerHTML = t.resultsBlock1P;
-  if (resultsPs[1] && t.resultsBlock2P) resultsPs[1].innerHTML = t.resultsBlock2P;
-  if (resultsPs[2] && t.resultsBlock3P) resultsPs[2].innerHTML = t.resultsBlock3P;
-  
-  // Tables
-  const tableTitles = document.querySelectorAll(".table-title");
-  const tableNotes = document.querySelectorAll(".table-note");
-  if (tableTitles[0] && t.mainResultsTitle) tableTitles[0].textContent = t.mainResultsTitle;
-  if (tableNotes[0] && t.mainResultsNote) tableNotes[0].textContent = t.mainResultsNote;
-  if (tableTitles[1] && t.ablationTitle) tableTitles[1].textContent = t.ablationTitle;
-  if (tableNotes[1] && t.ablationNote) tableNotes[1].textContent = t.ablationNote;
-  if (tableTitles[2] && t.lengthTitle) tableTitles[2].textContent = t.lengthTitle;
-  if (tableNotes[2] && t.lengthNote) tableNotes[2].textContent = t.lengthNote;
-  if (tableTitles[3] && t.oodTitle) tableTitles[3].textContent = t.oodTitle;
-  if (tableNotes[3] && t.oodNote) tableNotes[3].textContent = t.oodNote;
-  
-  // Analysis
-  const whyH3 = document.querySelectorAll(".analysis h3");
-  if (whyH3[0] && t.whyBlock1Title) whyH3[0].innerHTML = t.whyBlock1Title;
-  if (whyH3[1] && t.whyBlock2Title) whyH3[1].innerHTML = t.whyBlock2Title;
-  if (whyH3[2] && t.whyBlock3Title) whyH3[2].innerHTML = t.whyBlock3Title;
-  
-  const whyPs = document.querySelectorAll(".analysis .analysis-prose p");
-  if (whyPs[0] && t.whyBlock1P) whyPs[0].innerHTML = t.whyBlock1P;
-  if (whyPs[1] && t.whyBlock2P) whyPs[1].innerHTML = t.whyBlock2P;
-  if (whyPs[2] && t.whyBlock3P) whyPs[2].innerHTML = t.whyBlock3P;
-  
-  // Summary
-  const summaryPs = document.querySelectorAll(".summary .content-text p");
-  if (summaryPs[0] && t.summaryP1) summaryPs[0].innerHTML = t.summaryP1;
-  if (summaryPs[1] && t.summaryP2) summaryPs[1].innerHTML = t.summaryP2;
-  
-  // Citation
-  const citationNote = document.querySelector(".citation-note");
-  if (citationNote && t.citationNote) citationNote.textContent = t.citationNote;
-  
-  // Footer
-  const footerText = document.querySelector(".footer-text");
-  const footerMeta = document.querySelector(".footer-meta");
-  if (footerText && t.footerTeam) footerText.textContent = t.footerTeam;
-  if (footerMeta && t.footerMeta) footerMeta.textContent = t.footerMeta;
+
+  // ── Results ──
+  const resBlocks = document.querySelectorAll(".results .results-block");
+  if (resBlocks[0]) {
+    setText(resBlocks[0].querySelector("h3"), t.results.block1Title);
+    setHTML(resBlocks[0].querySelector(".prose p"), t.results.block1P);
+    setEach(resBlocks[0].querySelectorAll("figcaption"), (fc, i) => {
+      const badge = fc.querySelector(".fig-badge");
+      setHTML(fc, (badge ? badge.outerHTML : "") + (i === 0 ? t.results.fig1Cap : t.results.fig2Cap));
+    });
+  }
+  if (resBlocks[1]) {
+    setText(resBlocks[1].querySelector("h3"), t.results.block2Title);
+    setHTML(resBlocks[1].querySelector(".prose p"), t.results.block2P);
+    const fig3 = resBlocks[1].querySelector("figcaption");
+    if (fig3) {
+      const badge = fig3.querySelector(".fig-badge");
+      setHTML(fig3, (badge ? badge.outerHTML : "") + t.results.fig3Cap);
+    }
+    setText(resBlocks[1].querySelector(".table-title"), t.results.table21Title);
+    setText(resBlocks[1].querySelector(".table-note"), t.results.table21Note);
+  }
+  if (resBlocks[2]) {
+    setText(resBlocks[2].querySelector("h3"), t.results.block3Title);
+    setHTML(resBlocks[2].querySelector(".prose p"), t.results.block3P);
+    const fig4 = resBlocks[2].querySelector("figcaption");
+    if (fig4) {
+      const badge = fig4.querySelector(".fig-badge");
+      setHTML(fig4, (badge ? badge.outerHTML : "") + t.results.fig4Cap);
+    }
+    setText(resBlocks[2].querySelector(".table-title"), t.results.table31Title);
+    setText(resBlocks[2].querySelector(".table-note"), t.results.table31Note);
+  }
+  if (resBlocks[3]) {
+    setText(resBlocks[3].querySelector("h3"), t.results.block4Title);
+    setEach(resBlocks[3].querySelectorAll(".prose p"), (p, i) => setHTML(p, i === 0 ? t.results.block4P1 : t.results.block4P2));
+    setText(resBlocks[3].querySelector(".table-title"), t.results.mainTitle);
+    setText(resBlocks[3].querySelector(".table-note"), t.results.mainNote);
+    const fig5 = resBlocks[3].querySelector("figcaption");
+    if (fig5) {
+      const badge = fig5.querySelector(".fig-badge");
+      setHTML(fig5, (badge ? badge.outerHTML : "") + t.results.fig5Cap);
+    }
+  }
+
+  // ── Analysis ──
+  const anaBlocks = document.querySelectorAll(".analysis .analysis-block");
+  if (anaBlocks[0]) {
+    setText(anaBlocks[0].querySelector("h3"), t.analysis.block1Title);
+    setHTML(anaBlocks[0].querySelector(".analysis-prose p"), t.analysis.block1P);
+    const fig6 = anaBlocks[0].querySelector("figcaption");
+    if (fig6) {
+      const badge = fig6.querySelector(".fig-badge");
+      setHTML(fig6, (badge ? badge.outerHTML : "") + t.analysis.fig6Cap);
+    }
+  }
+  if (anaBlocks[1]) {
+    setText(anaBlocks[1].querySelector("h3"), t.analysis.block2Title);
+    setText(anaBlocks[1].querySelector(".table-note"), t.analysis.block2Note);
+  }
+  if (anaBlocks[2]) {
+    setText(anaBlocks[2].querySelector("h3"), t.analysis.block3Title);
+    setText(anaBlocks[2].querySelector(".table-note"), t.analysis.block3Note);
+  }
+  if (anaBlocks[3]) {
+    setText(anaBlocks[3].querySelector("h3"), t.analysis.block4Title);
+    setText(anaBlocks[3].querySelector(".table-note"), t.analysis.block4Note);
+  }
+  if (anaBlocks[4]) {
+    setText(anaBlocks[4].querySelector("h3"), t.analysis.block5Title);
+    setHTML(anaBlocks[4].querySelector(".prose p"), t.analysis.block5P);
+    setText(anaBlocks[4].querySelector(".table-note"), t.analysis.block5Note);
+  }
+
+  // ── Conclusion ──
+  setText(document.querySelector(".conclusion .section-head h2"), t.conclusion.title);
+  setEach(document.querySelectorAll(".conclusion-card > p"), (p, i) => setHTML(p, i === 0 ? t.conclusion.p1 : t.conclusion.p2));
+  setEach(document.querySelectorAll(".conclusion-list li"), (li, i) => setHTML(li, i === 0 ? t.conclusion.li1 : t.conclusion.li2));
+  setText(document.querySelector(".chip-note"), t.conclusion.chipNote);
+
+  // ── Citation ──
+  setText(document.querySelector(".citation-note"), t.citation.note);
+  setText(document.getElementById("copy-btn"), t.citation.copy);
+
+  // ── Footer ──
+  setText(document.querySelector(".footer-text"), t.footer.team);
+  setText(document.querySelector(".footer-meta"), t.footer.meta);
+
+  // ── 通用：图表徽章 / 表格标签 / 表头 ──
+  setEach(document.querySelectorAll(".fig-badge"), (el) => {
+    const zh = t.common.figBadges[el.textContent.trim()];
+    if (zh) setText(el, zh);
+  });
+  setEach(document.querySelectorAll(".tag"), (el) => {
+    const zh = t.common.tags[el.textContent.trim()];
+    if (zh) setText(el, zh);
+  });
+  setEach(document.querySelectorAll(".res-table th"), (el) => {
+    const zh = t.common.tableHeads[el.textContent.trim()];
+    if (zh) setText(el, zh);
+  });
+
+  // 重新排版 MathJax（中文内容中包含行内公式）
+  if (window.MathJax && MathJax.typesetPromise) {
+    try { MathJax.typesetPromise(); } catch (e) { /* noop */ }
+  }
 }

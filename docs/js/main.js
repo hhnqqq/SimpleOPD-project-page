@@ -86,18 +86,19 @@
   /* ─────────── Copy BibTeX ─────────── */
   const copyBtn = document.getElementById("copy-btn");
   if (copyBtn) {
+    const isZh = () => document.documentElement.lang === "zh";
     copyBtn.addEventListener("click", async () => {
       const code = document.getElementById("citation-code").innerText;
       try {
         await navigator.clipboard.writeText(code);
-        copyBtn.textContent = "Copied ✓";
+        copyBtn.textContent = isZh() ? (translations.zh.citation.copied) : "Copied ✓";
         copyBtn.classList.add("copied");
         setTimeout(() => {
-          copyBtn.textContent = "Copy";
+          copyBtn.textContent = isZh() ? (translations.zh.citation.copy) : "Copy";
           copyBtn.classList.remove("copied");
         }, 2200);
       } catch {
-        copyBtn.textContent = "Press Ctrl+C";
+        copyBtn.textContent = isZh() ? (translations.zh.citation.pressCtrl) : "Press Ctrl+C";
       }
     });
   }
