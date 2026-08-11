@@ -80,8 +80,8 @@ const translations = {
     
     resultsBlock1Title: "3.1 在线策略蒸馏中的训练不稳定性",
     resultsBlock1P1: "朴素的跨 tokenizer OPD 能够迁移推理能力，但会导致严重的训练不稳定性。我们观察到三个主要问题：",
-    resultsBlock1P2: "<strong>响应长度爆炸</strong> — 学生生成的响应长度在训练过程中持续增长，从初始的 2K token 增长到 12K+ token，远超过最大序列长度。",
-    resultsBlock1P3: "<strong>频繁截断</strong> — 由于长度爆炸，超过 40% 的响应被截断，导致不完整的推理链和性能下降。",
+    resultsBlock1P2: "<strong>响应长度爆炸</strong> — 学生生成的响应长度在训练过程中持续增长，在训练过程中持续增长，远超过最大序列长度。",
+    resultsBlock1P3: "<strong>频繁截断</strong> — 由于长度爆炸，大量响应被截断，导致不完整的推理链和性能下降。",
     resultsBlock1P4: "<strong>重复和循环</strong> — 学生开始产生重复的文本模式和推理循环，表明训练不稳定。",
     
     resultsBlock2Title: "3.1.2 特殊 Token 掩盖",
@@ -101,13 +101,13 @@ const translations = {
     whySub: "我们分析了 SimpleOPD 成功的三个关键因素：高词汇重叠、分布外泛化和数据效率。",
     
     whyBlock1Title: "3.3.1 词汇重叠",
-    whyBlock1P1: "<strong>词汇重叠率高</strong> — 我们的分析表明，学生生成的 token 中有 60-85% 在文本空间中与教师 token 对齐，这一比例在训练过程中持续增长。这种高重叠率使得跨 tokenizer 蒸馏成为可能，即使学生和教师使用完全不同的词汇表和分词策略。",
+    whyBlock1P1: "<strong>词汇重叠率高</strong> — 我们的分析表明，学生生成的文本中有很大一部分可以通过共享的表面跨度与教师 token 匹配，这一比例在训练过程中持续增长。跨 tokenizer OPD 中的部分对齐因此保留了大量可用的训练信号——<strong>无需完整的 tokenizer 兼容性</strong>。",
     
     whyBlock2Title: "3.3.2 分布外泛化",
     whyBlock2P1: "SimpleOPD 在数学训练领域之外也显示出泛化能力。学生模型在科学推理基准（HLE、HiPhO）上也有提升，表明学到的推理能力——如链式推理、假设验证和逻辑推导——可以迁移到新的领域。",
     
     whyBlock3Title: "3.3.3 训练数据的影响",
-    whyBlock3P1: "适度增加蒸馏序列长度（4K → 8K）可以进一步提升长推理能力的迁移，尤其是在跨 tokenizer 设置下。更长的上下文允许教师提供更完整的推理轨迹，学生可以从中学到更复杂的推理模式。",
+    whyBlock3P1: "适度增加蒸馏序列长度可以进一步提升长推理能力的迁移，尤其是在跨 tokenizer 设置下。更长的上下文允许教师提供更完整的推理轨迹，学生可以从中学到更复杂的推理模式。",
     
     // ========== Summary ==========
     summaryTitle: "总结",
@@ -119,7 +119,7 @@ const translations = {
     summaryList1: "跨 tokenizer OPD 无需完整的 token 级对齐即可工作",
     summaryList2: "学生参考 KL 稳定训练并防止长度爆炸",
     summaryList3: "特殊 token 掩盖保留完整推理链",
-    summaryList4: "高词汇重叠（60-85%）使跨 tokenizer 蒸馏成为可能",
+    summaryList4: "高词汇重叠（高对齐率）使跨 tokenizer 蒸馏成为可能",
     
     // ========== Citation ==========
     citationTitle: "引用",
