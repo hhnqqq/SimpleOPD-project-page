@@ -162,8 +162,8 @@
     function spawnToken(init) {
       const size = 9 + Math.random() * 13;
       return {
-        x: init ? Math.random() * W : -30,
-        y: init ? Math.random() * H : H + 30,
+        x: Math.random() * W,
+        y: init ? Math.random() * H : H + 10 + Math.random() * 60,
         vx: (Math.random() - 0.5) * 0.35,
         vy: -(0.25 + Math.random() * 0.75),
         size,
@@ -171,8 +171,7 @@
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
         rot: (Math.random() - 0.5) * 0.6,
         vr: (Math.random() - 0.5) * 0.01,
-        life: 1,
-        decay: 0.0008 + Math.random() * 0.0012,
+        age: 0,
       };
     }
     function init() {
@@ -184,12 +183,14 @@
       ctx.clearRect(0, 0, W, H);
       for (let i = tokens.length - 1; i >= 0; i--) {
         const t = tokens[i];
-        t.x += t.vx; t.y += t.vy; t.rot += t.vr; t.life -= t.decay;
-        if (t.life <= 0 || t.y < -40) { tokens[i] = spawnToken(false); continue; }
+        t.x += t.vx; t.y += t.vy; t.rot += t.vr; t.age++;
+        if (t.y < -60) { tokens[i] = spawnToken(false); continue; }
+        const fadeIn = Math.min(1, t.age / 60);
+        const fadeOut = Math.min(1, Math.max(0, (t.y + 60) / 120));
         ctx.save();
         ctx.translate(t.x, t.y);
         ctx.rotate(t.rot);
-        ctx.globalAlpha = Math.min(t.life, 1) * 0.5;
+        ctx.globalAlpha = fadeIn * fadeOut * 0.5;
         ctx.font = `600 ${t.size}px "JetBrains Mono", monospace`;
         ctx.fillStyle = t.color + "0.5)";
         const tw = ctx.measureText(t.text).width;
