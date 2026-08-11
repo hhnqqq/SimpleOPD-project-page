@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SimpleOPD — Simple Tokenizer-Agnostic On-Policy Distillation of Long-Context Reasoning</title>
+<meta name="description" content="SimpleOPD: Simple Tokenizer-Agnostic On-Policy Distillation of Long-Context Reasoning. Transferring proof-reasoning capabilities from SU-01 to short-context student models across different tokenizers." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+<script>
+  window.MathJax = {
+    tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] },
+    svg: { fontCache: 'global' }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#top">Simple<span class="brand-accent">OPD</span></a>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#method">Method</a></li>
+      <li><a href="#setup">Experiment</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#analysis">Analysis</a></li>
+      <li><a href="#citation">Citation</a></li>
+    </ul>
+    <a class="nav-cta" href="https://relic-care-6c0.notion.site/SimpleOPD-Simple-Tokenizer-Agnostic-On-Policy-Distillation-for-Long-Context-Reasoning-38ec37a600c080919c4bd481ee8305ff?source=copy_link" target="_blank" rel="noopener">Paper</a>
+  </div>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<header class="hero" id="top">
+  <canvas class="hero-bg" id="tokens-canvas"></canvas>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge reveal">
+      <span class="badge-dot"></span> P1 Team · Shanghai AI Lab · July 2026
+    </div>
+    <h1 class="hero-title reveal">
+      Simple<span class="grad">OPD</span>
+      <span class="hero-title-sub">Simple Tokenizer-Agnostic On-Policy Distillation<br/>of Long-Context Reasoning</span>
+    </h1>
+    <p class="hero-tagline reveal">
+      Transferring gold-medal-level <strong>proof-reasoning</strong> from a long-context teacher to
+      short-context students — <strong>across tokenizers</strong>, without SFT on teacher trajectories.
+    </p>
+
+    <div class="hero-authors reveal" id="authors">
+      <span class="author">Haonan He<sup>†</sup></span>
+      <span class="author">Haodi Lei<sup>†</sup></span>
+      <span class="author">Yun Luo<sup>†</sup></span>
+      <span class="author">Haoran Zhang</span>
+      <span class="author">Shuankai Zhang</span>
+      <span class="author">Yizhuo Li</span>
+      <span class="author">Shengji Tang</span>
+      <span class="author">Zhilin Wang</span>
+      <span class="author">Runzhe Zhan</span>
+      <span class="author">Lei Bai</span>
+      <span class="author">Ganqu Cui</span>
+      <span class="author">Fangchen Yu<sup>✉</sup></span>
+      <span class="author">Yafu Li<sup>✉</sup></span>
+      <span class="author">Peng Ye<sup>✉</sup></span>
+      <span class="author">Ning Ding<sup>✉</sup></span>
+      <span class="author">Yu Cheng<sup>✉</sup></span>
+    </div>
+    <p class="hero-affil reveal">
+      <sup>†</sup>Co-first authors&ensp;·&ensp;<sup>✉</sup>Corresponding authors&ensp;·&ensp;Project Lead<br/>
+      P1 Team, Shanghai AI Lab
+    </p>
+
+    <div class="hero-buttons reveal">
+      <a class="btn btn-primary" href="#method"><span>Read the Method</span><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14m-6-6 6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a class="btn btn-ghost" href="#citation">Cite this work</a>
+      <a class="btn btn-ghost" href="#results"><span class="btn-spark">✦</span> Key Results</a>
+    </div>
+
+    <div class="hero-metrics reveal">
+      <div class="metric">
+        <span class="metric-num" data-count="21.2" data-decimals="1">0</span>
+        <span class="metric-unit">points</span>
+        <span class="metric-label">ProofBench gain (Intern-S2-OPD)</span>
+      </div>
+      <div class="metric">
+        <span class="metric-num" data-count="55.2" data-decimals="1">0</span>
+        <span class="metric-unit">on ProofBench</span>
+        <span class="metric-label">surpassing Gemini-2.5-Pro &amp; GPT-5</span>
+      </div>
+      <div class="metric">
+        <span class="metric-num" data-count="5" data-decimals="0">0</span>
+        <span class="metric-unit">student models</span>
+        <span class="metric-label">Qwen3 · Qwen3.5 · Intern-S2 · GLM · Gemma</span>
+      </div>
+      <div class="metric">
+        <span class="metric-num" data-count="0" data-decimals="0">0</span>
+        <span class="metric-unit">truncation rate</span>
+        <span class="metric-label">with token masking + ref-KL</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,64 C360,120 720,0 1080,48 C1260,72 1380,56 1440,40 L1440,120 L0,120 Z" fill="var(--bg)"/></svg>
+  </div>
+</header>
+
+<!-- ══════════════════ TL;DR ══════════════════ -->
+<section class="section tldr" id="overview">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Overview</span>
+      <h2>TL;DR</h2>
+    </div>
+    <div class="tldr-card reveal">
+      <div class="tldr-card-icon"><span class="tldr-card-icon-inner">♞</span></div>
+      <p>
+        On-policy distillation (OPD) offers a promising way to transfer reasoning capabilities from stronger
+        teacher models, yet faces challenges including <strong>tokenizer mismatch</strong>,
+        <strong>teacher–student distribution mismatch</strong>, <strong>response length explosion</strong>, and
+        <strong>training instability</strong>. In this work, we study a setting where OPD transfers
+        proof-reasoning capabilities from the long-context reasoning model <span class="chip-teacher">SU-01</span>
+        to short-context student models. To handle tokenizer differences, we perform OPD in a
+        <strong>shared text space</strong> and align only tokens that occupy identical text spans under the
+        student and teacher tokenizers.
+      </p>
+      <p>
+        Naive OPD leads to excessive generation length and frequent truncation, destabilizing training.
+        We introduce a <strong>student reference KL loss</strong> and <strong>mask the advantages of special
+        termination tokens</strong> (<span class="mono">&lt;/think&gt;</span>, <span class="mono">&lt;|im_end|&gt;</span>).
+        This constrains the student from drifting too far from its initial policy, mitigating the distribution
+        mismatch and fostering steady length growth.
+      </p>
+      <p>
+        Experiments on same-family and different-family students — <span class="chip-student">Qwen3</span>,
+        <span class="chip-student">Qwen3.5</span>, <span class="chip-student">Intern-S2-Preview</span>,
+        <span class="chip-student">GLM-4.7-Flash</span>, <span class="chip-student">Gemma-4-26B</span> — show consistent gains in mathematical reasoning,
+        especially natural-language math proving. Notably, <strong>Intern-S2-Preview improves by
+        <span class="highlight">21.2 points</span> on ProofBench</strong>, reaching 55.2 and surpassing
+        Gemini-2.5-Pro — while also improving science benchmarks such as HLE and HiPhO, suggesting OPD
+        transfers reasoning capabilities that generalize beyond the mathematical training domain.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ TAKEAWAYS ══════════════════ -->
+<section class="section takeaways" id="takeaways">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Highlights</span>
+      <h2>Key Takeaways</h2>
+    </div>
+    <div class="takeaway-grid">
+      <div class="takeaway-card reveal" data-t="1">
+        <div class="tk-icon">01</div>
+        <h3>Shared Text Space</h3>
+        <p>Cross-tokenizer OPD works without full token-level alignment: use student-generated text as the shared space and align only tokens occupying identical text spans under both tokenizers.</p>
+      </div>
+      <div class="takeaway-card reveal" data-t="2">
+        <div class="tk-icon">02</div>
+        <h3>Length Explosion</h3>
+        <p>Direct cross-tokenizer OPD transfers proof-reasoning but causes excessive length growth, frequent truncation, and unstable training.</p>
+      </div>
+      <div class="takeaway-card reveal" data-t="3">
+        <div class="tk-icon">03</div>
+        <h3>Stabilization</h3>
+        <p>Masking special-termination-token advantages plus a student reference KL loss stabilizes training, reduces truncation, and improves final performance. Larger KL weight is needed when teacher and student differ more.</p>
+      </div>
+      <div class="takeaway-card reveal" data-t="4">
+        <div class="tk-icon">04</div>
+        <h3>Generalizable</h3>
+        <p>SimpleOPD works across model families without SFT on teacher trajectories, and a moderate increase in distillation length further benefits long-reasoning distillation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ METHOD ══════════════════ -->
+<section class="section method" id="method">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Method</span>
+      <h2>Cross-Tokenizer On-Policy Distillation</h2>
+      <p class="section-sub">The complete method is summarized below — from student rollout, to span-level token alignment, to the stabilized policy objective.</p>
+    </div>
+
+    <!-- Overview diagram -->
+    <div class="figure-card reveal">
+      <figure class="figure-wide">
+        <img src="assets/simpleopd_intro.png" alt="SimpleOPD overview: student generates response, teacher evaluates in its own tokenizer, aligned tokens transfer supervision." style="width: 100%; height: auto; display: block;" />
+        <figcaption><span class="fig-badge">Overview</span> SimpleOPD: the student samples a response in its own tokenizer; the teacher evaluates the same surface string under its own tokenizer and chat template; supervision flows only through tokens that occupy identical text spans.</figcaption>
+      </figure>
+    </div>
+
+    <!-- 1.1 Setup -->
+    <div class="method-block reveal">
+      <h3><span class="method-num">1.1</span> Setup</h3>
+      <p>
+        Let \(\mathbf{x}\) denote the input conversation as a list of messages. The student and teacher with
+        different tokenizers may use different chat templates, denoted by \(\mathcal{C}_{\theta}\) and
+        \(\mathcal{C}_{\phi}\). We first construct the student input context \(\mathbf{c}_{\theta}\) and sample a
+        response-token sequence with the student policy executed by the rollout engine
+        \(\pi_{\theta_{\mathrm{roll}}}\):
+      </p>
+      \[ y_{1:n} = (y_1,\ldots,y_n) \sim \pi_{\theta_{\mathrm{roll}}}(\cdot \mid \mathbf{c}_\theta). \]
+      <p>
+        Decoding \(y_{1:n}\) via the student tokenizer gives the response surface string \(s\). Instead of
+        passing the student context to the teacher, we reconstruct the teacher context text \(u_\phi\) using its
+        own chat template and append the student response:
+      </p>
+      \[ c_\phi = \mathcal{C}_\phi(\mathbf{x}), \qquad u_\phi = c_\phi \oplus s, \]
+      <p>
+        where \(\oplus\) denotes string concatenation. The complete text \(u_\phi\) is then tokenized with the
+        teacher encoder, giving \(z_{1:m}\). This lets the teacher evaluate the student response under its native
+        tokenizer and chat template — although \(z\) and \(y\) may differ, the response text being evaluated is
+        identical on both sides. The incremental text spans contributed by response tokens satisfy:
+      </p>
+      \[ \bigoplus_{t=1}^{n} \tau_\theta(y_t) \;=\; \bigoplus_{i=1}^{m} \tau_\phi(z_i) \;=\; s. \]
+    </div>
+
+    <!-- 1.2 Alignment -->
+    <div class="method-block reveal">
+      <h3><span class="method-num">1.2</span> Cross-Tokenizer Alignment</h3>
+      <p>Define the cumulative response text preceding each student and teacher token as</p>
+      \[ P_\theta(t) = \bigoplus_{k=1}^{t-1} \tau_\theta(y_k), \qquad P_\phi(i) = \bigoplus_{k=1}^{i-1} \tau_\phi(z_k), \]
+      <p>
+        A teacher position \(i\) is aligned with a student position \(t\) if both tokenizations have consumed the
+        same response prefix and the current tokens contribute the same text span:
+      </p>
+      \[ \mathcal{M} = \big\{\,(i,t) : P_\phi(i) = P_\theta(t) \;\wedge\; \tau_\phi(z_i) = \tau_\theta(y_t)\,\big\}. \]
+      <p>
+        Equivalently, an aligned teacher–student pair covers the same start and end offsets in the shared response
+        string \(s\). Tokens that overlap only partially are <em>not</em> aligned — the log-probability of one
+        teacher token cannot be uniquely assigned to multiple student tokens, nor can the log-probabilities of
+        multiple teacher tokens be merged into one student token.
+      </p>
+    </div>
+
+    <!-- 1.3 Aligned teacher log-probs -->
+    <div class="method-block reveal">
+      <h3><span class="method-num">1.3</span> Aligned Teacher Log-Probabilities</h3>
+      <p>For each student position \(t\), define the alignment indicator</p>
+      \[ a_t = \mathbf{1}\big[\exists\, i \text{ such that } (i,t) \in \mathcal{M}\big]. \]
+      <p>
+        Let \(\log\pi_\theta\) and \(\log\pi_\phi\) be the log-probabilities of the student and teacher policies.
+        We construct a student-length teacher target:
+      </p>
+      \[
+        \widetilde{\ell}_t^{\phi} =
+        \begin{cases}
+          \log \pi_{\phi}\big(z_{i} \mid c_{\phi},\, z_{&lt;i}\big), & a_t = 1,\\[2pt]
+          \log \pi_\theta\big(y_t \mid c_{\theta},\, y_{&lt;t}\big), & a_t = 0.
+        \end{cases}
+      \]
+      <p>
+        Thus aligned positions inherit the teacher log-probability, while unmatched positions fall back to the
+        student's own log-probability. We report the lexical overlap ratio
+      </p>
+      \[ \rho = \frac{|\mathcal{M}|}{n}, \]
+      <p>
+        which measures the fraction of student response tokens that receive teacher supervision. The complete
+        alignment procedure is shown in Algorithm 1.
+      </p>
+    </div>
+
+    <!-- Algorithm 1 -->
+    <div class="figure-card reveal">
+      <div class="algorithm">
+        <div class="algorithm-title"><span class="fig-badge">Algorithm 1</span> Cross-Tokenizer On-Policy Distillation</div>
+        <ol class="algorithm-body">
+          <li><span class="kw">Input:</span> student \(\theta\), teacher \(\phi\), dataset \(\mathcal{D}\)</li>
+          <li><span class="kw">for</span> each rollout iteration <span class="kw">do</span></li>
+          <li class="ind1"><span class="kw">for</span> each prompt \(\mathbf{x} \sim \mathcal{D}\) <span class="kw">do</span></li>
+          <li class="ind2">\(c_\theta \leftarrow \mathcal{C}_\theta(\mathbf{x})\) <span class="cmt">▷ student context</span></li>
+          <li class="ind2">\(y_{1:n} \sim \pi_{\theta_{\mathrm{roll}}}(\cdot \mid c_\theta)\) <span class="cmt">▷ sample response</span></li>
+          <li class="ind2">\(s \leftarrow \mathrm{decode}(y_{1:n})\) <span class="cmt">▷ response surface string</span></li>
+          <li class="ind2">\(u_\phi \leftarrow \mathcal{C}_\phi(\mathbf{x}) \oplus s\) <span class="cmt">▷ teacher context + response</span></li>
+          <li class="ind2">\(z_{1:m} \leftarrow \mathrm{encode}_\phi(u_\phi)\) <span class="cmt">▷ teacher tokenization</span></li>
+          <li class="ind2">compute \(P_\theta(t)\), \(P_\phi(i)\) <span class="cmt">▷ cumulative spans</span></li>
+          <li class="ind2">\(\mathcal{M} \leftarrow \{(i,t) : P_\phi(i){=}P_\theta(t) \wedge \tau_\phi(z_i){=}\tau_\theta(y_t)\}\)</li>
+          <li class="ind2">\(\widetilde{\ell}_t^{\phi} \leftarrow \text{cases of Eq.~1.3}\) <span class="cmt">▷ aligned teacher targets</span></li>
+          <li class="ind1"><span class="kw">end for</span></li>
+          <li class="ind1">update \(\theta\) with clipped PPO objective + student-reference KL</li>
+          <li><span class="kw">end for</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- 1.4 Objective -->
+    <div class="method-block reveal">
+      <h3><span class="method-num">1.4</span> On-Policy Distillation Objective</h3>
+      <p>The cross-tokenizer distillation objective is defined over aligned response positions:</p>
+      \[
+        \mathcal{L}_{\mathrm{Distill}}(\theta)
+        = \mathbb{E}_{y \sim \pi_\theta}\left[
+          \sum_{t=1}^{n} \log \pi_\theta(y_t \mid c_\theta, y_{&lt;t}) - \widetilde{\ell}_t^{\phi}
+        \right].
+      \]
+      <p>
+        This objective is a <strong>token-aligned surrogate for the reverse KL divergence</strong>. It compares
+        teacher and student probabilities only at positions where the two tokenizers induce the same local
+        segmentation of the response string. When the tokenizers are identical, every student token is aligned and
+        the objective reduces to
+      </p>
+      \[
+        \mathcal{L}_{\mathrm{Distill}}(\theta)
+        = \mathbb{E}_{y \sim \pi_\theta}\left[\log \frac{\pi_\theta(y \mid c_\theta)}{\pi_\phi(y \mid c_\phi)}\right]
+        = D_{\mathrm{KL}}\big(\pi_\theta(\cdot \mid c_\theta) \parallel \pi_\phi(\cdot \mid c_\phi)\big).
+      \]
+      <p>
+        When the tokenizers differ, the same response string is factorized into different token sequences, so the
+        exact token-level KL is not directly computable. To enable multiple policy updates on the same rollout
+        batch, we substitute the online log-probability with its pre-update counterpart for unmatched positions and
+        use fixed policy advantages with the PPO clipped loss:
+      </p>
+      \[
+        \widehat{A}_t = \widetilde{\ell}_t^{\phi} - \log \pi_{\theta_{\mathrm{old}}}(y_t \mid c_\theta, y_{&lt;t}),
+        \qquad
+        r_t = \frac{\pi_\theta(y_t \mid c_\theta, y_{&lt;t})}{\pi_{\theta_{\mathrm{old}}}(y_t \mid c_\theta, y_{&lt;t})}.
+      \]
+      <p>The resulting objective is</p>
+      \[
+        \mathcal{L}_\theta = -\mathbb{E}\left[
+          \sum_{t=1}^{n} \min\Big(
+            r_t \widehat{A}_t,\; \mathrm{clip}(r_t, 1-\epsilon, 1+\epsilon)\, \widehat{A}_t
+          \Big)
+        \right].
+      \]
+    </div>
+
+    <!-- Stabilization -->
+    <div class="method-block reveal">
+      <h3><span class="method-num">1.5</span> Training Stabilization</h3>
+      <p>Naive OPD makes students verbose and truncation-prone. Two simple fixes keep training steady:</p>
+      <div class="stab-grid">
+        <div class="stab-card">
+          <div class="stab-num">✂</div>
+          <h4>Special-Token Masking</h4>
+          <p>Mask the OPD loss on structural tokens <span class="mono">&lt;/think&gt;</span> and <span class="mono">&lt;|im_end|&gt;</span> — they control format and termination and need not match the teacher exactly.</p>
+        </div>
+        <div class="stab-card">
+          <div class="stab-num">⚖</div>
+          <h4>Student Reference KL</h4>
+          <p>Add a reference-KL term (\(k_{\mathrm{KL}} \in \{0.5, 1.5\}\)) to prevent the student policy from deviating excessively from its initial distribution, preserving general capabilities.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ EXPERIMENT SETUP ══════════════════ -->
+<section class="section setup" id="setup">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Experimental Setting</span>
+      <h2>Teacher, Students &amp; Data</h2>
+    </div>
+
+    <div class="setup-grid">
+      <div class="setup-card reveal">
+        <div class="setup-card-head">
+          <span class="setup-icon setup-icon-teacher">🎓</span>
+          <h3>Teacher: <span class="teacher-name">SU-01</span></h3>
+        </div>
+        <p>An IMO gold-medal-level mathematical reasoning model developed by our team, providing token-level supervision for on-policy distillation of its proof-generation capability.</p>
+        <ul class="setup-tags">
+          <li>IMO gold-medal level</li>
+          <li>Long-context</li>
+          <li>Math proving</li>
+        </ul>
+      </div>
+
+      <div class="setup-card reveal">
+        <div class="setup-card-head">
+          <span class="setup-icon setup-icon-student">🧑‍🎓</span>
+          <h3>Students</h3>
+        </div>
+        <p>Same-vocabulary and cross-tokenizer settings, spanning architectures and tokenizer designs:</p>
+        <ul class="student-list">
+          <li><span class="student-chip">Qwen3-4B</span> same-family</li>
+          <li><span class="student-chip">Qwen3-30B-A3B</span> same-family</li>
+          <li><span class="student-chip">Qwen3.5-4B</span> cross-tokenizer</li>
+          <li><span class="student-chip">Qwen3.5-35B-A3B</span> cross-tokenizer</li>
+          <li><span class="student-chip">Intern-S2-Preview</span> cross-tokenizer</li>
+          <li><span class="student-chip">GLM-4.7-Flash</span> cross-tokenizer</li>
+          <li><span class="student-chip">Gemma-4-26B-A4B</span> cross-tokenizer</li>
+        </ul>
+      </div>
+
+      <div class="setup-card reveal setup-card-wide">
+        <div class="setup-card-head">
+          <span class="setup-icon setup-icon-data">📚</span>
+          <h3>Training Data — Mathematical Proof Problems</h3>
+        </div>
+        <div class="data-grid">
+          <div class="data-item">
+            <span class="data-count" data-count="63">0</span>
+            <span class="data-name">OPC problems</span>
+            <span class="data-desc">Open Proof Corpus</span>
+          </div>
+          <div class="data-item">
+            <span class="data-count" data-count="2948">0</span>
+            <span class="data-name">AoPS problems</span>
+            <span class="data-desc">Art of Problem Solving</span>
+          </div>
+          <div class="data-item">
+            <span class="data-count" data-count="900">0</span>
+            <span class="data-name">Books problems</span>
+            <span class="data-desc">Competition training books</span>
+          </div>
+          <div class="data-item">
+            <span class="data-count" data-count="617">0</span>
+            <span class="data-name">Shuzhimi problems</span>
+            <span class="data-desc">Chinese math forum + Evan Chen's olympiad materials</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-card reveal setup-card-wide">
+        <div class="setup-card-head">
+          <span class="setup-icon setup-icon-config">⚙️</span>
+          <h3>Implementation Details</h3>
+        </div>
+        <div class="config-grid">
+          <div class="config-item"><span class="config-key">Framework</span><span class="config-val">Slime (OPD) · SGLang (eval)</span></div>
+          <div class="config-item"><span class="config-key">Rollout iterations</span><span class="config-val">100</span></div>
+          <div class="config-item"><span class="config-key">Learning rate</span><span class="config-val">1e-6</span></div>
+          <div class="config-item"><span class="config-key">Rollout batch size</span><span class="config-val">64</span></div>
+          <div class="config-item"><span class="config-key">Samples / prompt</span><span class="config-val">4</span></div>
+          <div class="config-item"><span class="config-key">Max sequence length</span><span class="config-val">32K tokens</span></div>
+          <div class="config-item"><span class="config-key">Clipping coefficient</span><span class="config-val">0.2</span></div>
+          <div class="config-item"><span class="config-key">Distill coefficient</span><span class="config-val">1.0</span></div>
+          <div class="config-item"><span class="config-key">Policy updates / step</span><span class="config-val">4</span></div>
+          <div class="config-item"><span class="config-key">KL coefficient</span><span class="config-val">0.5 (Qwen/Intern) · 1.5 (GLM)</span></div>
+        </div>
+        <p class="config-note">
+          <strong>Evaluation.</strong> ProofBench (non-verifiable, DeepSeek-V4-Flash judge, 4 rollouts averaged) plus
+          AnswerBench &amp; AIME25 (verifiable; rule-based verifier first, GPT-OSS-120B fallback, 8 rollouts averaged).
+          Temperature 1.0 · top-p 0.95 · repetition penalty 1.0 · max response length 160K tokens.
+          Best checkpoint selected on average of AIME@4 and AnswerBench@1.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ RESULTS ══════════════════ -->
+<section class="section results" id="results">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Results</span>
+      <h2>Results &amp; Analysis</h2>
+      <p class="section-sub">From instability to steady gains — how masking and reference-KL stabilize cross-tokenizer OPD, and what it achieves on proof and science benchmarks.</p>
+    </div>
+
+    <!-- 3.1 Instability -->
+    <div class="results-block reveal">
+      <h3>3.1&ensp;Training Instability in On-Policy Distillation</h3>
+      <div class="prose reveal">
+        <p>
+          During OPD training, Intern-S2-Preview shows modest gains but clear signs of degeneration: the
+          <strong>truncation rate</strong> and <strong>repetition rate</strong> rise substantially while the average
+          response length grows sharply. The effect is even more pronounced for Qwen3.5-35B-A3B, whose task
+          performance deteriorates with a persistently high truncation rate. Apparent performance gains can come at
+          the cost of increasingly verbose and unstable generation behavior.
+        </p>
+      </div>
+      <div class="fig-grid">
+        <figure class="figure-card reveal">
+          <img src="assets/no_trick-proof_data_2x4_repetition_length.png" alt="Training dynamics of Intern-S2-Preview during naive OPD" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+          <figcaption><span class="fig-badge">Fig. 1</span> Training dynamics of Intern-S2-Preview: rising truncation, repetition, and response length indicate increasingly unstable generation.</figcaption>
+        </figure>
+        <figure class="figure-card reveal">
+          <img src="assets/qw_repetition_length.png" alt="Training dynamics of Qwen3.5-35B-A3B during naive OPD" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+          <figcaption><span class="fig-badge">Fig. 2</span> Training dynamics of Qwen3.5-35B-A3B: rising truncation and length accompanied by degraded task performance.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- 3.1.2 Special token masking -->
+    <div class="results-block reveal">
+      <h3>3.1.2&ensp;Special-Token Masking</h3>
+      <div class="prose reveal">
+        <p>
+          Many generated responses fail to emit termination tokens such as <span class="mono">&lt;/think&gt;</span>,
+          suggesting the student is strongly affected by the teacher's long outputs and gradually loses the ability
+          to terminate properly. We therefore <strong>mask the OPD loss on structural tokens</strong>
+          <span class="mono">&lt;/think&gt;</span> and <span class="mono">&lt;|im_end|&gt;</span> — these control the
+          output format and termination behavior and need not match the teacher distribution exactly.
+        </p>
+      </div>
+      <div class="fig-grid fig-grid-1">
+        <figure class="figure-card reveal">
+          <img src="assets/qwen3-intern-wo-ref_loss_4panel_no_ref.png" alt="Effect of special-token masking on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+          <figcaption><span class="fig-badge">Fig. 3</span> Masking alone mitigates length-related instability but cannot resolve the length-expansion problem: truncation keeps rising in the later stage.</figcaption>
+        </figure>
+        <div class="table-card reveal">
+          <h4 class="table-title">Effect of special-token masking</h4>
+          <div class="table-wrap">
+            <table class="res-table">
+              <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+              <tbody>
+                <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+                <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
+                <tr class="row-mask"><td>OPD + Spec Mask</td><td>38.10</td><td>77.60</td><td>95.00</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">Masking improves training stability, but alone neither solves length expansion nor improves OPD performance.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.1.3 Ref KL -->
+    <div class="results-block reveal">
+      <h3>3.1.3&ensp;Student Reference KL Loss</h3>
+      <div class="prose reveal">
+        <p>
+          We introduce a <strong>student reference KL loss</strong> (\(k_{\mathrm{KL}}=0.5\)) to prevent the student
+          policy from deviating excessively from its initial distribution, preserving general capabilities during
+          distillation. The truncation rate is effectively reduced to <strong>nearly zero</strong>, while AIME25 and
+          AnswerBench improve consistently.
+        </p>
+      </div>
+      <div class="fig-grid fig-grid-1">
+        <figure class="figure-card reveal">
+          <img src="assets/no-special-token_4panel_no_special_token.png" alt="Effect of student reference KL loss on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+          <figcaption><span class="fig-badge">Fig. 4</span> Adding the student reference KL loss stabilizes training; truncation is effectively eliminated while AIME25 and AnswerBench improve.</figcaption>
+        </figure>
+        <div class="table-card reveal">
+          <h4 class="table-title">Effect of reference KL loss</h4>
+          <div class="table-wrap">
+            <table class="res-table">
+              <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+              <tbody>
+                <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+                <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
+                <tr class="row-opd"><td>OPD + Ref KL</td><td>38.50</td><td>79.10</td><td>95.80</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="table-note">OPD + Ref KL: ProofBench@4 21.70 → 38.50; AnswerBench@8 76.03 → 79.10; AIME25@8 88.33 → 95.80.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3.2 Main results -->
+    <div class="results-block reveal">
+      <h3>3.2&ensp;Main Results</h3>
+      <div class="prose reveal">
+        <p>
+          Combining special-token masking with the student reference KL loss achieves the strongest results
+          (\(k_{\mathrm{KL}}=0.5\) for Qwen-series and Intern-S2-Preview; \(1.5\) for GLM-4.7-Flash).
+        </p>
+      </div>
+      <div class="table-card table-card-wide reveal">
+        <h4 class="table-title">Main results across student families</h4>
+        <div class="table-wrap">
+          <table class="res-table main-table">
+            <thead><tr><th>Model</th><th>Proofbench@4</th><th>Δ</th><th>AnswerBench@8</th><th>Δ</th><th>AIME25@8</th><th>Δ</th><th>AMOBench@8</th><th>Δ</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>—</td><td>77.50</td><td>—</td><td>94.60</td><td>—</td><td>61.75</td><td>—</td></tr>
+              <tr class="row-base"><td>Qwen3-4B <span class="tag tag-base">base</span></td><td>11.42</td><td></td><td>47.50</td><td></td><td>71.25</td><td></td><td>23.00</td><td></td></tr>
+              <tr class="row-opd"><td>Qwen3-4B-OPD</td><td>23.72</td><td class="delta">+12.30</td><td>64.50</td><td class="delta">+17.00</td><td>90.83</td><td class="delta">+19.58</td><td>35.00</td><td class="delta">+12.00</td></tr>
+              <tr class="row-base"><td>Qwen3-30B-A3B <span class="tag tag-base">base</span></td><td>13.80</td><td></td><td>59.13</td><td></td><td>88.33</td><td></td><td>36.50</td><td></td></tr>
+              <tr class="row-opd"><td>Qwen3-30B-A3B-OPD</td><td>36.47</td><td class="delta">+22.67</td><td>74.46</td><td class="delta">+15.33</td><td>93.75</td><td class="delta">+5.42</td><td>52.75</td><td class="delta">+16.25</td></tr>
+              <tr class="row-base"><td>Qwen3.5-4B <span class="tag tag-base">base</span></td><td>15.90</td><td></td><td>60.94</td><td></td><td>86.67</td><td></td><td>32.00</td><td></td></tr>
+              <tr class="row-opd"><td>Qwen3.5-4B-OPD</td><td>28.61</td><td class="delta">+12.71</td><td>67.84</td><td class="delta">+6.90</td><td>91.67</td><td class="delta">+5.00</td><td>51.25</td><td class="delta">+19.25</td></tr>
+              <tr class="row-base"><td>Qwen3.5-35B-A3B <span class="tag tag-base">base</span></td><td>26.78</td><td></td><td>73.16</td><td></td><td>94.60</td><td></td><td>57.25</td><td></td></tr>
+              <tr class="row-opd"><td>Qwen3.5-35B-OPD</td><td>42.39</td><td class="delta">+15.61</td><td>80.15</td><td class="delta">+6.99</td><td>96.66</td><td class="delta">+2.06</td><td>61.25</td><td class="delta">+4.00</td></tr>
+              <tr class="row-base"><td>GLM-4.7-Flash <span class="tag tag-base">base</span></td><td>30.75</td><td></td><td>69.59</td><td></td><td>92.08</td><td></td><td>—</td><td></td></tr>
+              <tr class="row-opd"><td>GLM-4.7-Flash-OPD</td><td>37.08</td><td class="delta">+6.33</td><td>72.78</td><td class="delta">+3.19</td><td>93.75</td><td class="delta">+1.67</td><td>—</td><td></td></tr>
+              <tr class="row-base"><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td></td><td>76.03</td><td></td><td>88.33</td><td></td><td>58.00</td><td></td></tr>
+              <tr class="row-opd row-hero"><td>Intern-S2-OPD</td><td>44.50</td><td class="delta">+22.80</td><td>80.10</td><td class="delta">+4.07</td><td>95.00</td><td class="delta">+6.67</td><td>59.50</td><td class="delta">+1.50</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Consistent gains across every student family — same-vocabulary and cross-tokenizer alike. AMOBench (Australian Mathematical Olympiad) further validates the reasoning transfer.</p>
+      </div>
+
+      <div class="prose reveal">
+        <p>
+          We also evaluate ProofBench using <strong>Gemini-2.5-Pro</strong> as the judge, following the same
+          evaluation setting as SU-01. Intern-S2-OPD improves from <strong>34.0 to 55.2</strong> — a
+          <strong>+21.2 point</strong> gain — surpassing Gemini-2.5-Pro and GPT-5, and significantly narrowing the
+          gap to SU-01 and DeepSeek-V3.2-Speciale.
+        </p>
+      </div>
+      <div class="figure-card reveal">
+        <img src="assets/proofbench_results_style.png" alt="ProofBench comparison with Gemini-2.5-Pro as judge" style="width: 100%; max-width: 750px; height: auto; display: block; margin: 0 auto; border-radius: 12px;" />
+        <figcaption><span class="fig-badge">Fig. 5</span> ProofBench (Gemini-2.5-Pro judge): Intern-S2-OPD reaches 55.2 — a +21.2 point gain that surpasses Gemini-2.5-Pro and GPT-5 while significantly narrowing the gap to SU-01 and DeepSeek-V3.2-Speciale.</figcaption>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ ANALYSIS ══════════════════ -->
+<section class="section analysis" id="analysis">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Deeper Analysis</span>
+      <h2>Why It Works</h2>
+    </div>
+
+    <!-- Lexical overlap -->
+    <div class="analysis-block reveal">
+      <h3>3.3.1&ensp;Lexical Overlap</h3>
+      <div class="fig-grid fig-grid-1">
+        <figure class="figure-card reveal">
+          <img src="assets/lexical_overlap_3panel.png" alt="Lexical overlap curves across models during OPD training" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+          <figcaption><span class="fig-badge">Fig. 6</span> Lexical-overlap curves during OPD training: all models start with a high aligned-token ratio that increases further over time — a large portion of student text is matchable to teacher tokens via shared surface spans.</figcaption>
+        </figure>
+        <div class="analysis-prose reveal">
+          <p>
+            Despite tokenizer differences, a large portion of student-generated text can be matched to teacher
+            tokens through shared surface spans. Partial alignment in cross-tokenizer OPD therefore preserves a
+            substantial amount of usable training signal — <strong>without requiring full tokenizer
+            compatibility</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- OOD -->
+    <div class="analysis-block reveal">
+      <h3>3.3.2&ensp;Out-of-Domain Generalization</h3>
+      <div class="table-card reveal">
+        <div class="table-wrap">
+          <table class="res-table ood-table">
+            <thead><tr><th>Model</th><th>FrontierScience Olympiad</th><th>HLE (text-only)</th><th>HiPhO</th><th>FrontierScience Research</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>61.5</td><td>20.7</td><td>35.0</td><td>11.7</td></tr>
+              <tr class="row-base"><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>60.6</td><td>19.6</td><td>38.6</td><td>1.7</td></tr>
+              <tr class="row-opd row-hero"><td>Intern-S2-OPD</td><td>60.9</td><td>20.5</td><td class="delta">41.1</td><td>5.0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Trained only on math proof data, Intern-S2-OPD keeps its broad scientific reasoning — and even <strong>surpasses SU-01 on HiPhO</strong> (38.6 → 41.1), suggesting OPD may further benefit physics-oriented reasoning.</p>
+      </div>
+    </div>
+
+    <!-- Data effect -->
+    <div class="analysis-block reveal">
+      <h3>3.3.3&ensp;Effect of Training Data</h3>
+      <div class="table-card reveal">
+        <div class="table-wrap">
+          <table class="res-table">
+            <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+              <tr class="row-base"><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
+              <tr><td>OPD proof + verifiable data</td><td>38.50</td><td>81.10</td><td>95.00</td></tr>
+              <tr class="row-opd row-hero"><td>OPD proof data</td><td class="delta">44.50</td><td>80.10</td><td>95.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">Proof-focused data is the better transfer medium: 44.50 on ProofBench@4, approaching the teacher SU-01. Adding verifiable math data only marginally helps AnswerBench@8 (80.10 → 81.10) while weakening proof transfer (44.50 → 38.50).</p>
+      </div>
+    </div>
+
+    <!-- Length effect -->
+    <div class="analysis-block reveal">
+      <h3>3.3.4&ensp;Effect of OPD Length</h3>
+      <div class="table-card reveal">
+        <div class="table-wrap">
+          <table class="res-table">
+            <thead><tr><th>Model</th><th>Length</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>—</td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+              <tr><td>Qwen3.5-35B-A3B</td><td>6k</td><td>40.07</td><td>77.97</td><td>96.25</td></tr>
+              <tr class="row-opd row-hero"><td>Qwen3.5-35B-A3B</td><td>32k</td><td class="delta">42.39</td><td>80.16</td><td>96.67</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">For long-context proof reasoning, 6k is insufficient to capture the teacher's reasoning patterns. Extending distillation length from 6k → 32k improves all benchmarks, most strongly on ProofBench — longer reasoning traces better approximate the teacher's long-context capability.</p>
+      </div>
+    </div>
+
+    <!-- GLM KL -->
+    <div class="analysis-block reveal">
+      <h3>3.3.5&ensp;KL Loss on GLM-4.7-Flash</h3>
+      <div class="prose reveal">
+        <p>
+          With \(k_{\mathrm{KL}} = 1.0\), GLM reaches <strong>100% truncation</strong> after only 40 steps — a
+          stronger reference-KL coefficient is needed when teacher and student differ more substantially.
+        </p>
+      </div>
+      <div class="table-card reveal">
+        <div class="table-wrap">
+          <table class="res-table">
+            <thead><tr><th>Model</th><th>Student KL Coef.</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>—</td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+              <tr class="row-base"><td>GLM-4.7-Flash <span class="tag tag-base">base</span></td><td>—</td><td>30.75</td><td>69.59</td><td>92.08</td></tr>
+              <tr class="row-opd row-hero"><td>GLM-4.7-Flash-OPD</td><td>1.5</td><td class="delta">37.08</td><td>72.78</td><td>93.75</td></tr>
+              <tr><td>GLM-4.7-Flash-OPD</td><td>2.0</td><td>36.99</td><td>72.75</td><td>93.80</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">A stronger student KL coefficient controls truncation for GLM-4.7-Flash while still allowing effective transfer. But too large a coefficient (2.0) overly constrains the policy and limits further gains.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CONCLUSION ══════════════════ -->
+<section class="section conclusion" id="conclusion">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">Conclusion</span>
+      <h2>Summary</h2>
+    </div>
+    <div class="conclusion-card reveal">
+      <p>
+        We studied on-policy distillation from a long-context reasoning model (<span class="chip-teacher">SU-01</span>)
+        to short-context student models. To handle tokenizer differences, we performed OPD in a
+        <strong>shared text space</strong> and aligned only tokens occupying identical text spans under the student
+        and teacher tokenizers. Naive distillation led to severe training instability — output length kept
+        increasing, termination tokens were often missing, and many responses were truncated. We introduced two
+        simple but effective stabilization techniques:
+      </p>
+      <ul class="conclusion-list">
+        <li><span class="concl-num">✂</span> masking the OPD loss on structural termination tokens (<span class="mono">&lt;/think&gt;</span>, <span class="mono">&lt;|im_end|&gt;</span>)</li>
+        <li><span class="concl-num">⚖</span> adding a reference KL loss to constrain the student policy</li>
+      </ul>
+      <p>
+        These techniques substantially reduced length explosion and truncation while improving reasoning
+        performance. Experiments across same-family and different-family student models showed consistent gains,
+        with <strong>Intern-S2-Preview achieving a 21.2-point improvement on ProofBench</strong> — an effective and
+        generalizable way to transfer long-context reasoning capabilities to short-context models across
+        <strong>different tokenizers and model families</strong>.
+      </p>
+      <div class="conclusion-footer">
+        <span class="chip-note">Code &amp; arXiv release coming soon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CITATION ══════════════════ -->
+<section class="section citation" id="citation">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="overline">BibTeX</span>
+      <h2>Citation</h2>
+    </div>
+    <div class="citation-card reveal">
+      <div class="citation-toolbar">
+        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+        <span class="citation-filename">simpleopd.bib</span>
+        <button class="copy-btn" id="copy-btn" type="button">Copy</button>
+      </div>
+      <pre class="citation-code" id="citation-code"><code>@online{SU-01-OPD-2026,
+  title  = {SimpleOPD: Simple Tokenizer-Agnostic On-Policy Distillation
+            for Long-Context Reasoning},
+  author = {SU-01 Team},
+  year   = {2026},
+  month  = {July},
+  url    = {https://relic-care-6c0.notion.site/SimpleOPD-Simple-Tokenizer-Agnostic-On-Policy-Distillation-for-Long-Context-Reasoning-38ec37a600c080919c4bd481ee8305ff}
+}</code></pre>
+      <p class="citation-note">We will release the code and the arXiv version soon.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">Simple<span class="brand-accent">OPD</span></div>
+    <p class="footer-text">P1 Team · Shanghai AI Lab</p>
+    <p class="footer-meta">This page is a project overview; figures marked "illustrative" are schematic reconstructions and will be replaced by the official paper figures.</p>
+  </div>
+</footer>
+
+<!-- back to top -->
+<button class="back-to-top" id="back-to-top" aria-label="Back to top">↑</button>
+
+<script src="js/main.js"></script>
+</body>
+</html>
