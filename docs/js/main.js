@@ -103,6 +103,37 @@
     });
   }
 
+  /* ─────────── Lightbox: click figure images to enlarge ─────────── */
+  const lightbox = document.createElement("div");
+  lightbox.className = "lightbox";
+  lightbox.setAttribute("aria-hidden", "true");
+  document.body.appendChild(lightbox);
+
+  function openLightbox(src, alt) {
+    lightbox.innerHTML = "";
+    const img = document.createElement("img");
+    img.src = src;
+    if (alt) img.alt = alt;
+    lightbox.appendChild(img);
+    lightbox.classList.add("open");
+    lightbox.setAttribute("aria-hidden", "false");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    lightbox.setAttribute("aria-hidden", "true");
+    document.body.style.overflow = "";
+  }
+  document.querySelectorAll(".figure-card img, figure img").forEach((img) => {
+    img.addEventListener("click", () => openLightbox(img.src, img.alt || ""));
+  });
+  lightbox.addEventListener("click", (e) => {
+    if (e.target === lightbox || e.target.tagName === "IMG") closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeLightbox();
+  });
+
   /* ─────────── Magnetic hover on takeaway cards ─────────── */
   if (!prefersReduced) {
     document.querySelectorAll(".takeaway-card").forEach((card) => {

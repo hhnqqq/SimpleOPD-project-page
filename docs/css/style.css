@@ -636,6 +636,23 @@ figcaption em { color: var(--text-faint); }
 .back-to-top.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
 .back-to-top:hover { background: rgba(212, 165, 116, 0.2); border-color: var(--accent-1); transform: translateY(-3px); }
 
+/* ────────────────────────── LIGHTBOX ────────────────────────── */
+.figure-card img, figure img {
+  cursor: zoom-in;
+}
+.lightbox {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(13, 11, 6, 0.92);
+  opacity: 0; pointer-events: none; transition: opacity 0.3s var(--ease);
+}
+.lightbox.open { opacity: 1; pointer-events: auto; }
+.lightbox img {
+  max-width: 92vw; max-height: 92vh;
+  border-radius: 12px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+  cursor: zoom-out;
+}
+
 /* ────────────────────────── REVEAL ────────────────────────── */
 .reveal {
   opacity: 0; transform: translateY(34px);
