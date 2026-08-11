@@ -16,15 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
     if (lang === "zh") {
       applyTranslations(translations.zh);
     } else {
-      location.reload(); // 重新加载恢复英文
+      location.reload();
     }
   });
 });
 
 function applyTranslations(t) {
-  // ========== Hero ==========
+  // Hero
   const tagline = document.querySelector(".hero-tagline");
-  if (tagline) tagline.innerHTML = t.heroTagline;
+  if (tagline && t.heroTagline) tagline.innerHTML = t.heroTagline;
   
   const affil = document.querySelector(".hero-affil");
   if (affil && t.heroAffil) affil.textContent = t.heroAffil;
@@ -34,153 +34,135 @@ function applyTranslations(t) {
   if (metrics[0]) {
     const unit = metrics[0].querySelector(".metric-unit");
     const label = metrics[0].querySelector(".metric-label");
-    if (unit) unit.textContent = t.metricStudents;
-    if (label) label.textContent = t.metricStudentsLabel;
+    if (unit && t.metricStudents) unit.textContent = t.metricStudents;
+    if (label && t.metricStudentsLabel) label.textContent = t.metricStudentsLabel;
   }
   if (metrics[1]) {
     const unit = metrics[1].querySelector(".metric-unit");
     const label = metrics[1].querySelector(".metric-label");
-    if (unit) unit.textContent = t.metricGain;
-    if (label) label.textContent = t.metricGainLabel;
+    if (unit && t.metricGain) unit.textContent = t.metricGain;
+    if (label && t.metricGainLabel) label.textContent = t.metricGainLabel;
   }
   if (metrics[2]) {
     const unit = metrics[2].querySelector(".metric-unit");
     const label = metrics[2].querySelector(".metric-label");
-    if (unit) unit.textContent = t.metricAlign;
-    if (label) label.textContent = t.metricAlignLabel;
+    if (unit && t.metricAlign) unit.textContent = t.metricAlign;
+    if (label && t.metricAlignLabel) label.textContent = t.metricAlignLabel;
   }
   
-  // ========== Section Titles ==========
-  const sectionMap = [
-    { selector: ".tldr .section-head h2", key: "tldrTitle" },
-    { selector: ".takeaways .section-head h2", key: "takeawayTitle" },
-    { selector: ".method .section-head h2", key: "methodTitle" },
-    { selector: ".method .section-sub", key: "methodSub" },
-    { selector: ".setup .section-head h2", key: "setupTitle" },
-    { selector: ".setup .section-sub", key: "setupSub" },
-    { selector: ".results .section-head h2", key: "resultsTitle" },
-    { selector: ".results .section-sub", key: "resultsSub" },
-    { selector: ".analysis .section-head h2", key: "whyTitle" },
-    { selector: ".analysis .section-sub", key: "whySub" },
-    { selector: ".summary .section-head h2", key: "summaryTitle" },
-    { selector: ".summary .section-sub", key: "summarySub" },
-    { selector: ".citation .section-head h2", key: "citationTitle" }
+  // Section titles and subs
+  const titleMap = [
+    [".tldr .section-head h2", "tldrTitle"],
+    [".takeaways .section-head h2", "takeawayTitle"],
+    [".method .section-head h2", "methodTitle"],
+    [".method .section-sub", "methodIntro"],
+    [".setup .section-head h2", "setupTitle"],
+    [".results .section-head h2", "resultsTitle"],
+    [".results .section-sub", "resultsSub"],
+    [".analysis .section-head h2", "whyTitle"],
+    [".summary .section-head h2", "summaryTitle"],
+    [".citation .section-head h2", "citationTitle"]
   ];
   
-  sectionMap.forEach(({ selector, key }) => {
-    const el = document.querySelector(selector);
+  titleMap.forEach(([sel, key]) => {
+    const el = document.querySelector(sel);
     if (el && t[key]) el.textContent = t[key];
   });
   
-  // ========== TL;DR ==========
+  // TL;DR
   const tldrPs = document.querySelectorAll(".tldr-card p");
-  if (tldrPs[0]) tldrPs[0].innerHTML = t.tldrP1;
-  if (tldrPs[1]) tldrPs[1].innerHTML = t.tldrP2;
-  if (tldrPs[2]) tldrPs[2].innerHTML = t.tldrP3;
+  if (tldrPs[0] && t.tldrP1) tldrPs[0].innerHTML = t.tldrP1;
+  if (tldrPs[1] && t.tldrP2) tldrPs[1].innerHTML = t.tldrP2;
+  if (tldrPs[2] && t.tldrP3) tldrPs[2].innerHTML = t.tldrP3;
   
-  // ========== Takeaways ==========
+  // Takeaways
   const tkCards = document.querySelectorAll(".takeaway-card");
-  const tkData = [
-    { title: "tk1Title", desc: "tk1Desc" },
-    { title: "tk2Title", desc: "tk2Desc" },
-    { title: "tk3Title", desc: "tk3Desc" },
-    { title: "tk4Title", desc: "tk4Desc" }
-  ];
-  
-  tkCards.forEach((card, i) => {
-    if (tkData[i]) {
-      const h3 = card.querySelector("h3");
-      const p = card.querySelector("p");
-      if (h3) h3.textContent = t[tkData[i].title];
-      if (p) p.textContent = t[tkData[i].desc];
+  [
+    ["tk1Title", "tk1Desc"],
+    ["tk2Title", "tk2Desc"],
+    ["tk3Title", "tk3Desc"],
+    ["tk4Title", "tk4Desc"]
+  ].forEach(([titleKey, descKey], i) => {
+    if (tkCards[i]) {
+      const h3 = tkCards[i].querySelector("h3");
+      const p = tkCards[i].querySelector("p");
+      if (h3 && t[titleKey]) h3.textContent = t[titleKey];
+      if (p && t[descKey]) p.textContent = t[descKey];
     }
   });
   
-  // ========== Method ==========
-  const methodBlocks = document.querySelectorAll(".method .stab-card, .method .opd-diagram");
-  // Method block titles (h3)
-  const methodTitles = document.querySelectorAll(".method h3");
-  if (methodTitles[0] && t.methodBlock1Title) methodTitles[0].textContent = t.methodBlock1Title;
-  if (methodTitles[1] && t.methodBlock2Title) methodTitles[1].textContent = t.methodBlock2Title;
-  if (methodTitles[2] && t.methodBlock3Title) methodTitles[2].textContent = t.methodBlock3Title;
-  if (methodTitles[3] && t.methodBlock4Title) methodTitles[3].textContent = t.methodBlock4Title;
-  
-  // Method block paragraphs (需要根据实际 HTML 结构调整)
-  const methodPs = document.querySelectorAll(".method .stab-card p, .method .content-text p");
-  // 这里简化处理，实际需要更精确的选择器
-  
-  // ========== Setup ==========
+  // Setup cards
   const setupCards = document.querySelectorAll(".setup-card");
   if (setupCards[0]) {
     const h3 = setupCards[0].querySelector("h3");
     const p = setupCards[0].querySelector("p");
-    if (h3) h3.innerHTML = t.setupTeacherTitle;
-    if (p) p.innerHTML = t.setupTeacherDesc;
+    if (h3 && t.setupTeacherTitle) h3.textContent = t.setupTeacherTitle;
+    if (p && t.setupTeacherDesc) p.innerHTML = t.setupTeacherDesc;
   }
   if (setupCards[1]) {
     const h3 = setupCards[1].querySelector("h3");
     const p = setupCards[1].querySelector("p");
-    if (h3) h3.textContent = t.setupStudentTitle;
-    if (p) p.innerHTML = t.setupStudentDesc;
+    if (h3 && t.setupStudentTitle) h3.textContent = t.setupStudentTitle;
+    if (p && t.setupStudentDesc) p.innerHTML = t.setupStudentDesc;
   }
   if (setupCards[2]) {
     const h3 = setupCards[2].querySelector("h3");
-    const p = setupCards[2].querySelector("p");
-    if (h3) h3.textContent = t.setupDataTitle;
-    if (p) p.innerHTML = t.setupDataDesc;
+    if (h3 && t.setupDataTitle) h3.textContent = t.setupDataTitle;
+  }
+  if (setupCards[3]) {
+    const h3 = setupCards[3].querySelector("h3");
+    const p = setupCards[3].querySelector("p");
+    if (h3 && t.setupEvalTitle) h3.textContent = t.setupEvalTitle;
+    if (p && t.setupEvalDesc) p.textContent = t.setupEvalDesc;
   }
   
-  // ========== Results ==========
-  // Main results table
-  const mainResultsTitle = document.querySelector(".results .table-title");
-  if (mainResultsTitle) mainResultsTitle.textContent = t.mainResultsTitle;
-  
-  const mainResultsNote = document.querySelector(".results .table-note");
-  if (mainResultsNote) mainResultsNote.textContent = t.mainResultsNote;
-  
-  // Ablation table
-  const ablationTitle = document.querySelectorAll(".results .table-title")[1];
-  if (ablationTitle) ablationTitle.textContent = t.ablationTitle;
-  
-  const ablationNote = document.querySelectorAll(".results .table-note")[1];
-  if (ablationNote) ablationNote.textContent = t.ablationNote;
-  
-  // Results block titles
+  // Results blocks (h3 titles)
   const resultsH3 = document.querySelectorAll(".results h3");
-  if (resultsH3[0] && t.resultsBlock1Title) resultsH3[0].textContent = t.resultsBlock1Title;
-  if (resultsH3[1] && t.resultsBlock2Title) resultsH3[1].textContent = t.resultsBlock2Title;
-  if (resultsH3[2] && t.resultsBlock3Title) resultsH3[2].textContent = t.resultsBlock3Title;
+  if (resultsH3[0] && t.resultsBlock1Title) resultsH3[0].innerHTML = t.resultsBlock1Title;
+  if (resultsH3[1] && t.resultsBlock2Title) resultsH3[1].innerHTML = t.resultsBlock2Title;
+  if (resultsH3[2] && t.resultsBlock3Title) resultsH3[2].innerHTML = t.resultsBlock3Title;
   
-  // ========== Analysis ==========
+  // Results paragraphs
+  const resultsPs = document.querySelectorAll(".results .prose p");
+  if (resultsPs[0] && t.resultsBlock1P) resultsPs[0].innerHTML = t.resultsBlock1P;
+  if (resultsPs[1] && t.resultsBlock2P) resultsPs[1].innerHTML = t.resultsBlock2P;
+  if (resultsPs[2] && t.resultsBlock3P) resultsPs[2].innerHTML = t.resultsBlock3P;
+  
+  // Tables
+  const tableTitles = document.querySelectorAll(".table-title");
+  const tableNotes = document.querySelectorAll(".table-note");
+  if (tableTitles[0] && t.mainResultsTitle) tableTitles[0].textContent = t.mainResultsTitle;
+  if (tableNotes[0] && t.mainResultsNote) tableNotes[0].textContent = t.mainResultsNote;
+  if (tableTitles[1] && t.ablationTitle) tableTitles[1].textContent = t.ablationTitle;
+  if (tableNotes[1] && t.ablationNote) tableNotes[1].textContent = t.ablationNote;
+  if (tableTitles[2] && t.lengthTitle) tableTitles[2].textContent = t.lengthTitle;
+  if (tableNotes[2] && t.lengthNote) tableNotes[2].textContent = t.lengthNote;
+  if (tableTitles[3] && t.oodTitle) tableTitles[3].textContent = t.oodTitle;
+  if (tableNotes[3] && t.oodNote) tableNotes[3].textContent = t.oodNote;
+  
+  // Analysis
   const whyH3 = document.querySelectorAll(".analysis h3");
-  if (whyH3[0] && t.whyBlock1Title) whyH3[0].textContent = t.whyBlock1Title;
-  if (whyH3[1] && t.whyBlock2Title) whyH3[1].textContent = t.whyBlock2Title;
-  if (whyH3[2] && t.whyBlock3Title) whyH3[2].textContent = t.whyBlock3Title;
+  if (whyH3[0] && t.whyBlock1Title) whyH3[0].innerHTML = t.whyBlock1Title;
+  if (whyH3[1] && t.whyBlock2Title) whyH3[1].innerHTML = t.whyBlock2Title;
+  if (whyH3[2] && t.whyBlock3Title) whyH3[2].innerHTML = t.whyBlock3Title;
   
-  const whyPs = document.querySelectorAll(".analysis .analysis-prose p, .analysis .content-text p");
-  if (whyPs[0] && t.whyBlock1P1) whyPs[0].innerHTML = t.whyBlock1P1;
-  if (whyPs[1] && t.whyBlock2P1) whyPs[1].innerHTML = t.whyBlock2P1;
-  if (whyPs[2] && t.whyBlock3P1) whyPs[2].innerHTML = t.whyBlock3P1;
+  const whyPs = document.querySelectorAll(".analysis .analysis-prose p");
+  if (whyPs[0] && t.whyBlock1P) whyPs[0].innerHTML = t.whyBlock1P;
+  if (whyPs[1] && t.whyBlock2P) whyPs[1].innerHTML = t.whyBlock2P;
+  if (whyPs[2] && t.whyBlock3P) whyPs[2].innerHTML = t.whyBlock3P;
   
-  // ========== Summary ==========
-  const summaryPs = document.querySelectorAll(".summary .content-text p, .summary p");
+  // Summary
+  const summaryPs = document.querySelectorAll(".summary .content-text p");
   if (summaryPs[0] && t.summaryP1) summaryPs[0].innerHTML = t.summaryP1;
   if (summaryPs[1] && t.summaryP2) summaryPs[1].innerHTML = t.summaryP2;
   
-  // Summary list
-  const summaryLis = document.querySelectorAll(".summary ul li, .summary ol li");
-  if (summaryLis[0] && t.summaryList1) summaryLis[0].textContent = t.summaryList1;
-  if (summaryLis[1] && t.summaryList2) summaryLis[1].textContent = t.summaryList2;
-  if (summaryLis[2] && t.summaryList3) summaryLis[2].textContent = t.summaryList3;
-  if (summaryLis[3] && t.summaryList4) summaryLis[3].textContent = t.summaryList4;
-  
-  // ========== Citation ==========
+  // Citation
   const citationNote = document.querySelector(".citation-note");
-  if (citationNote) citationNote.textContent = t.citationNote;
+  if (citationNote && t.citationNote) citationNote.textContent = t.citationNote;
   
-  // ========== Footer ==========
+  // Footer
   const footerText = document.querySelector(".footer-text");
   const footerMeta = document.querySelector(".footer-meta");
-  if (footerText) footerText.textContent = t.footerTeam;
-  if (footerMeta) footerMeta.textContent = t.footerMeta;
+  if (footerText && t.footerTeam) footerText.textContent = t.footerTeam;
+  if (footerMeta && t.footerMeta) footerMeta.textContent = t.footerMeta;
 }
