@@ -19,7 +19,7 @@ const translations = {
       badge: "P1 团队 · 上海人工智能实验室 · 2026 年 7 月",
       titleSub: "面向长上下文推理的简单<br/>Tokenizer 无关在线策略蒸馏",
       tagline: "将 IMO 金牌级<strong>证明推理</strong>能力从长上下文教师模型迁移到短上下文学生模型——<strong>跨 tokenizer</strong>，无需在教师轨迹上进行监督微调。",
-      affil: "<sup>†</sup>共同一作&ensp;·&ensp;<sup>✉</sup>通讯作者&ensp;·&ensp;项目负责人<br/>P1 团队 · 上海人工智能实验室",
+      affil: "<sup>†</sup>共同一作&ensp;·&ensp;<sup>✉</sup>通讯作者&ensp;·&ensp;<sup>★</sup>项目负责人<br/>P1 团队 · 上海人工智能实验室",
       btnRead: "阅读方法",
       btnCite: "引用本文",
       btnKeyResults: "关键结果",
