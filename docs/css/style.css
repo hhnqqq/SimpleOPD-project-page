@@ -11,8 +11,8 @@
   --border: rgba(139, 116, 85, 0.15);
   --border-strong: rgba(139, 116, 85, 0.28);
   --text: #2d2416;
-  --text-dim: #5d4e37;
-  --text-faint: #8b7355;
+  --text-dim: #3d2e1f;
+  --text-faint: #4d3a28;
   --accent-1: #d4a574;
   --accent-2: #c9a87d;
   --accent-3: #b8956a;
@@ -44,7 +44,7 @@ body {
 
 .container { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
 
-.mono { font-family: var(--font-mono); font-size: 0.88em; background: rgba(148, 163, 184, 0.12); padding: 0.15em 0.45em; border-radius: 6px; color: #cbd5e1; }
+.mono { font-family: var(--font-mono); font-size: 0.88em; background: rgba(148, 163, 184, 0.12); padding: 0.15em 0.45em; border-radius: 6px; color: var(--text); }
 
 /* ────────────────────────── NAVBAR ────────────────────────── */
 .nav {
@@ -135,9 +135,9 @@ body {
 }
 .hero-tagline {
   max-width: 760px; margin: 0 auto 40px;
-  font-size: 1.08rem; color: var(--text-dim); line-height: 1.75;
+  font-size: 1.08rem; color: rgba(245, 241, 232, 0.85); line-height: 1.75;
 }
-.hero-tagline strong { color: var(--text); font-weight: 600; }
+.hero-tagline strong { color: var(--hero-text); font-weight: 600; }
 
 /* authors */
 .hero-authors {
@@ -145,12 +145,12 @@ body {
   max-width: 900px; margin: 0 auto 18px;
 }
 .author {
-  font-size: 0.96rem; color: var(--text); font-weight: 500;
+  font-size: 0.96rem; color: var(--hero-text); font-weight: 500;
   padding: 3px 0; transition: color 0.2s;
 }
 .author:hover { color: var(--accent-1); }
 .author sup { color: var(--accent-3); font-size: 0.7rem; margin-left: 2px; }
-.hero-affil { font-size: 0.88rem; color: var(--text-faint); margin-bottom: 44px; line-height: 1.8; }
+.hero-affil { font-size: 0.88rem; color: rgba(245, 241, 232, 0.7); margin-bottom: 44px; line-height: 1.8; }
 .hero-affil sup { color: var(--accent-3); }
 
 /* buttons */
@@ -237,7 +237,7 @@ body {
   background: radial-gradient(circle, rgba(212, 165, 116, 0.16), transparent 70%);
   pointer-events: none;
 }
-.tldr-card p { margin-bottom: 18px; font-size: 1.04rem; color: #cbd5e1; position: relative; z-index: 1; }
+.tldr-card p { margin-bottom: 18px; font-size: 1.04rem; color: var(--text); position: relative; z-index: 1; }
 .tldr-card p:last-child { margin-bottom: 0; }
 .tldr-card strong { color: var(--text); font-weight: 600; }
 .tldr-card-icon {
@@ -304,7 +304,7 @@ body {
   border: 1px solid rgba(212, 165, 116, 0.4); border-radius: 10px;
   padding: 5px 12px; flex-shrink: 0;
 }
-.method-block p { color: #cbd5e1; margin-bottom: 14px; font-size: 1.02rem; }
+.method-block p { color: var(--text); margin-bottom: 14px; font-size: 1.02rem; }
 .method-block p:last-child { margin-bottom: 0; }
 .method-block em { color: var(--accent-2); font-style: italic; }
 
@@ -370,7 +370,7 @@ figcaption em { color: var(--text-faint); }
 .algorithm-body {
   list-style: none; padding: 22px 24px; counter-reset: alg;
   font-family: var(--font-mono); font-size: 0.9rem; line-height: 2.05;
-  color: #cbd5e1; overflow-x: auto;
+  color: var(--text); overflow-x: auto;
 }
 .algorithm-body li { counter-increment: alg; white-space: nowrap; }
 .algorithm-body li::before {
@@ -461,14 +461,14 @@ figcaption em { color: var(--text-faint); }
 }
 .config-item:hover { border-color: rgba(201, 168, 125, 0.4); transform: translateY(-3px); }
 .config-key { display: block; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); font-weight: 600; }
-.config-val { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 0.88rem; color: #cbd5e1; }
+.config-val { display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 0.88rem; color: var(--text); }
 .config-note { margin-top: 20px; font-size: 0.88rem !important; color: var(--text-dim); padding-top: 18px; border-top: 1px dashed var(--border-strong); }
 .config-note strong { color: var(--text); }
 
 /* ────────────────────────── RESULTS ────────────────────────── */
 .results-block { margin-bottom: 84px; }
 .results-block h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; margin-bottom: 24px; }
-.prose p { color: #cbd5e1; font-size: 1.02rem; margin-bottom: 14px; }
+.prose p { color: var(--text); font-size: 1.02rem; margin-bottom: 14px; }
 .prose p:last-child { margin-bottom: 0; }
 .prose strong { color: var(--text); }
 
@@ -513,7 +513,7 @@ figcaption em { color: var(--text-faint); }
 }
 .res-table td {
   padding: 13px 16px; border-bottom: 1px solid rgba(148, 163, 184, 0.08);
-  color: #cbd5e1; white-space: nowrap;
+  color: var(--text); white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 .res-table tbody tr { transition: background 0.25s; }
@@ -558,7 +558,7 @@ figcaption em { color: var(--text-faint); }
   background: radial-gradient(circle, rgba(201, 168, 125, 0.16), transparent 70%);
   pointer-events: none;
 }
-.conclusion-card p { font-size: 1.04rem; color: #cbd5e1; margin-bottom: 20px; position: relative; z-index: 1; }
+.conclusion-card p { font-size: 1.04rem; color: var(--text); margin-bottom: 20px; position: relative; z-index: 1; }
 .conclusion-card strong { color: var(--text); }
 .conclusion-list { list-style: none; margin: 28px 0; display: flex; flex-direction: column; gap: 14px; position: relative; z-index: 1; }
 .conclusion-list li {
@@ -605,12 +605,12 @@ figcaption em { color: var(--text-faint); }
 .citation-code {
   padding: 26px 28px; overflow-x: auto;
   background: #0a0f20; font-family: var(--font-mono); font-size: 0.88rem; line-height: 1.85;
-  color: #cbd5e1;
+  color: var(--text);
 }
 .citation-note { padding: 18px 26px; font-size: 0.86rem; color: var(--text-dim); border-top: 1px dashed var(--border); }
 
 /* ────────────────────────── FOOTER ────────────────────────── */
-.footer { padding: 60px 0 70px; border-top: 1px solid var(--border); background: #080d1c; }
+.footer { padding: 60px 0 70px; border-top: 1px solid var(--border); background: #2d2416; }
 .footer-inner { text-align: center; }
 .footer-brand { font-family: var(--font-display); font-size: 1.6rem; font-weight: 700; margin-bottom: 10px; }
 .footer-text { color: var(--text-dim); font-size: 0.92rem; }
