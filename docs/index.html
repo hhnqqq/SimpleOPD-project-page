@@ -197,9 +197,9 @@
     <!-- Overview diagram -->
     <div class="figure-card reveal">
       <figure class="figure-wide">
-        <div style="position: relative; width: 100%; aspect-ratio: 2568 / 1462.5;">
-          <embed src="assets/simpleopd_intro.pdf" type="application/pdf" aria-label="SimpleOPD overview: student generates response, teacher evaluates in its own tokenizer, aligned tokens transfer supervision." style="position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;" />
-        </div>
+        <a href="assets/simpleopd_intro.pdf" target="_blank" rel="noopener" title="Open vector PDF version" style="display: block;">
+          <img src="assets/simpleopd_intro.webp" alt="SimpleOPD overview: student generates response, teacher evaluates in its own tokenizer, aligned tokens transfer supervision." style="width: 100%; height: auto; display: block;" />
+        </a>
         <figcaption><span class="fig-badge">Overview</span> SimpleOPD: the student samples a response in its own tokenizer; the teacher evaluates the same surface string under its own tokenizer and chat template; supervision flows only through tokens that occupy identical text spans.</figcaption>
       </figure>
     </div>
@@ -569,21 +569,21 @@
         <h4 class="table-title">Main results across student families</h4>
         <div class="table-wrap">
           <table class="res-table main-table">
-            <thead><tr><th>Model</th><th>Proofbench@4</th><th>Δ</th><th>AnswerBench@8</th><th>Δ</th><th>AIME25@8</th><th>Δ</th><th>AMOBench@8</th><th>Δ</th></tr></thead>
+            <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th><th>AMOBench@8</th></tr></thead>
             <tbody>
-              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>—</td><td>77.50</td><td>—</td><td>94.60</td><td>—</td><td>61.75</td><td>—</td></tr>
-              <tr class="row-base"><td>Qwen3-4B <span class="tag tag-base">base</span></td><td>11.42</td><td></td><td>47.50</td><td></td><td>71.25</td><td></td><td>23.00</td><td></td></tr>
-              <tr class="row-opd"><td>Qwen3-4B-OPD</td><td>23.72</td><td class="delta">+12.30</td><td>64.50</td><td class="delta">+17.00</td><td>90.83</td><td class="delta">+19.58</td><td>35.00</td><td class="delta">+12.00</td></tr>
-              <tr class="row-base"><td>Qwen3-30B-A3B <span class="tag tag-base">base</span></td><td>13.80</td><td></td><td>59.13</td><td></td><td>88.33</td><td></td><td>36.50</td><td></td></tr>
-              <tr class="row-opd"><td>Qwen3-30B-A3B-OPD</td><td>36.47</td><td class="delta">+22.67</td><td>74.46</td><td class="delta">+15.33</td><td>93.75</td><td class="delta">+5.42</td><td>52.75</td><td class="delta">+16.25</td></tr>
-              <tr class="row-base"><td>Qwen3.5-4B <span class="tag tag-base">base</span></td><td>15.90</td><td></td><td>60.94</td><td></td><td>86.67</td><td></td><td>32.00</td><td></td></tr>
-              <tr class="row-opd"><td>Qwen3.5-4B-OPD</td><td>28.61</td><td class="delta">+12.71</td><td>67.84</td><td class="delta">+6.90</td><td>91.67</td><td class="delta">+5.00</td><td>51.25</td><td class="delta">+19.25</td></tr>
-              <tr class="row-base"><td>Qwen3.5-35B-A3B <span class="tag tag-base">base</span></td><td>26.78</td><td></td><td>73.16</td><td></td><td>94.60</td><td></td><td>57.25</td><td></td></tr>
-              <tr class="row-opd"><td>Qwen3.5-35B-OPD</td><td>42.39</td><td class="delta">+15.61</td><td>80.15</td><td class="delta">+6.99</td><td>96.66</td><td class="delta">+2.06</td><td>61.25</td><td class="delta">+4.00</td></tr>
-              <tr class="row-base"><td>GLM-4.7-Flash <span class="tag tag-base">base</span></td><td>30.75</td><td></td><td>69.59</td><td></td><td>92.08</td><td></td><td>—</td><td></td></tr>
-              <tr class="row-opd"><td>GLM-4.7-Flash-OPD</td><td>37.08</td><td class="delta">+6.33</td><td>72.78</td><td class="delta">+3.19</td><td>93.75</td><td class="delta">+1.67</td><td>—</td><td></td></tr>
-              <tr class="row-base"><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td></td><td>76.03</td><td></td><td>88.33</td><td></td><td>58.00</td><td></td></tr>
-              <tr class="row-opd"><td>Intern-S2-OPD</td><td>44.50</td><td class="delta">+22.80</td><td>80.10</td><td class="delta">+4.07</td><td>95.00</td><td class="delta">+6.67</td><td>59.50</td><td class="delta">+1.50</td></tr>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td><td>61.75</td></tr>
+              <tr class="row-base"><td>Qwen3-4B <span class="tag tag-base">base</span></td><td>11.42</td><td>47.50</td><td>71.25</td><td>23.00</td></tr>
+              <tr class="row-opd"><td>Qwen3-4B-OPD</td><td><strong>23.72</strong> <span class="d-inline">↑12.30</span></td><td><strong>64.50</strong> <span class="d-inline">↑17.00</span></td><td><strong>90.83</strong> <span class="d-inline">↑19.58</span></td><td><strong>35.00</strong> <span class="d-inline">↑12.00</span></td></tr>
+              <tr class="row-base"><td>Qwen3-30B-A3B <span class="tag tag-base">base</span></td><td>13.80</td><td>59.13</td><td>88.33</td><td>36.50</td></tr>
+              <tr class="row-opd"><td>Qwen3-30B-A3B-OPD</td><td><strong>36.47</strong> <span class="d-inline">↑22.67</span></td><td><strong>74.46</strong> <span class="d-inline">↑15.33</span></td><td><strong>93.75</strong> <span class="d-inline">↑5.42</span></td><td><strong>52.75</strong> <span class="d-inline">↑16.25</span></td></tr>
+              <tr class="row-base"><td>Qwen3.5-4B <span class="tag tag-base">base</span></td><td>15.90</td><td>60.94</td><td>86.67</td><td>32.00</td></tr>
+              <tr class="row-opd"><td>Qwen3.5-4B-OPD</td><td><strong>28.61</strong> <span class="d-inline">↑12.71</span></td><td><strong>67.84</strong> <span class="d-inline">↑6.90</span></td><td><strong>91.67</strong> <span class="d-inline">↑5.00</span></td><td><strong>51.25</strong> <span class="d-inline">↑19.25</span></td></tr>
+              <tr class="row-base"><td>Qwen3.5-35B-A3B <span class="tag tag-base">base</span></td><td>26.78</td><td>73.16</td><td>94.60</td><td>57.25</td></tr>
+              <tr class="row-opd"><td>Qwen3.5-35B-OPD</td><td><strong>42.39</strong> <span class="d-inline">↑15.61</span></td><td><strong>80.15</strong> <span class="d-inline">↑6.99</span></td><td><strong>96.66</strong> <span class="d-inline">↑2.06</span></td><td><strong>61.25</strong> <span class="d-inline">↑4.00</span></td></tr>
+              <tr class="row-base"><td>GLM-4.7-Flash <span class="tag tag-base">base</span></td><td>30.75</td><td>69.59</td><td>92.08</td><td>—</td></tr>
+              <tr class="row-opd"><td>GLM-4.7-Flash-OPD</td><td><strong>37.08</strong> <span class="d-inline">↑6.33</span></td><td><strong>72.78</strong> <span class="d-inline">↑3.19</span></td><td><strong>93.75</strong> <span class="d-inline">↑1.67</span></td><td>—</td></tr>
+              <tr class="row-base"><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td><td>58.00</td></tr>
+              <tr class="row-opd"><td>Intern-S2-OPD</td><td><strong>44.50</strong> <span class="d-inline">↑22.80</span></td><td><strong>80.10</strong> <span class="d-inline">↑4.07</span></td><td><strong>95.00</strong> <span class="d-inline">↑6.67</span></td><td><strong>59.50</strong> <span class="d-inline">↑1.50</span></td></tr>
             </tbody>
           </table>
         </div>

@@ -532,8 +532,12 @@ figcaption em { color: var(--text-faint); }
 .res-table tbody tr:hover { background: rgba(212, 165, 116, 0.08); }
 .res-table .row-teacher td { color: #a43d7a; }
 .res-table .row-base td { color: #57616e; }
-.res-table .row-opd td { color: #3b3a87; }
+.res-table .row-opd td { color: #3b3a87; background: #e1f0fa; }
+.res-table .row-opd td:first-child { border-left: 2px solid rgba(100, 150, 200, 0.45); }
+.res-table .row-opd:hover td { background: #d3e9f7; }
+.res-table .row-opd strong { color: #2b2a66; }
 .res-table .delta { color: #15803d; font-weight: 700; }
+.res-table .d-inline { color: #15803d; font-weight: 700; font-size: 0.78em; margin-left: 5px; white-space: nowrap; }
 .tag {
   display: inline-block; font-size: 0.66rem; font-weight: 700; letter-spacing: 0.05em;
   padding: 2px 9px; border-radius: 999px; margin-left: 6px; vertical-align: 2px;
