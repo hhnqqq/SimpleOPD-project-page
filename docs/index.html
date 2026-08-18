@@ -197,7 +197,9 @@
     <!-- Overview diagram -->
     <div class="figure-card reveal">
       <figure class="figure-wide">
-        <img src="assets/simpleopd_intro.png" alt="SimpleOPD overview: student generates response, teacher evaluates in its own tokenizer, aligned tokens transfer supervision." style="width: 100%; height: auto; display: block;" />
+        <div style="position: relative; width: 100%; aspect-ratio: 2568 / 1462.5;">
+          <embed src="assets/simpleopd_intro.pdf" type="application/pdf" aria-label="SimpleOPD overview: student generates response, teacher evaluates in its own tokenizer, aligned tokens transfer supervision." style="position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;" />
+        </div>
         <figcaption><span class="fig-badge">Overview</span> SimpleOPD: the student samples a response in its own tokenizer; the teacher evaluates the same surface string under its own tokenizer and chat template; supervision flows only through tokens that occupy identical text spans.</figcaption>
       </figure>
     </div>
