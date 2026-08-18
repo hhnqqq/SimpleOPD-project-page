@@ -501,25 +501,23 @@
           output format and termination behavior and need not match the teacher distribution exactly.
         </p>
       </div>
-      <div class="fig-grid fig-grid-1">
-        <figure class="figure-card reveal">
-          <img src="assets/qwen3-intern-wo-ref_loss_4panel_no_ref.png" alt="Effect of special-token masking on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
-          <figcaption><span class="fig-badge">Fig. 3</span> Masking alone mitigates length-related instability but cannot resolve the length-expansion problem: truncation keeps rising in the later stage.</figcaption>
-        </figure>
-        <div class="table-card reveal">
-          <h4 class="table-title">Effect of special-token masking</h4>
-          <div class="table-wrap">
-            <table class="res-table">
-              <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
-              <tbody>
-                <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
-                <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
-                <tr class="row-mask"><td>OPD + Spec Mask</td><td>38.10</td><td>77.60</td><td>95.00</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="table-note">Masking improves training stability, but alone neither solves length expansion nor improves OPD performance.</p>
+      <figure class="figure-card reveal">
+        <img src="assets/qwen3-intern-wo-ref_loss_4panel_no_ref.png" alt="Effect of special-token masking on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+        <figcaption><span class="fig-badge">Fig. 3</span> Masking alone mitigates length-related instability but cannot resolve the length-expansion problem: truncation keeps rising in the later stage.</figcaption>
+      </figure>
+      <div class="table-card reveal" style="max-width: 820px; width: 100%; margin: 0 auto;">
+        <h4 class="table-title">Effect of special-token masking</h4>
+        <div class="table-wrap">
+          <table class="res-table">
+            <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+              <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
+              <tr class="row-mask"><td>OPD + Spec Mask</td><td>38.10</td><td>77.60</td><td>95.00</td></tr>
+            </tbody>
+          </table>
         </div>
+        <p class="table-note">Masking improves training stability, but alone neither solves length expansion nor improves OPD performance.</p>
       </div>
     </div>
 
@@ -534,25 +532,23 @@
           AnswerBench improve consistently.
         </p>
       </div>
-      <div class="fig-grid fig-grid-1">
-        <figure class="figure-card reveal">
-          <img src="assets/no-special-token_4panel_no_special_token.png" alt="Effect of student reference KL loss on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
-          <figcaption><span class="fig-badge">Fig. 4</span> Adding the student reference KL loss stabilizes training; truncation is effectively eliminated while AIME25 and AnswerBench improve.</figcaption>
-        </figure>
-        <div class="table-card reveal">
-          <h4 class="table-title">Effect of reference KL loss</h4>
-          <div class="table-wrap">
-            <table class="res-table">
-              <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
-              <tbody>
-                <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
-                <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
-                <tr class="row-opd"><td>OPD + Ref KL</td><td>38.50</td><td>79.10</td><td>95.80</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="table-note">OPD + Ref KL: ProofBench@4 21.70 → 38.50; AnswerBench@8 76.03 → 79.10; AIME25@8 88.33 → 95.80.</p>
+      <figure class="figure-card reveal">
+        <img src="assets/no-special-token_4panel_no_special_token.png" alt="Effect of student reference KL loss on training stability" style="width: 100%; height: auto; display: block; border-radius: 12px;" />
+        <figcaption><span class="fig-badge">Fig. 4</span> Adding the student reference KL loss stabilizes training; truncation is effectively eliminated while AIME25 and AnswerBench improve.</figcaption>
+      </figure>
+      <div class="table-card reveal" style="max-width: 820px; width: 100%; margin: 0 auto;">
+        <h4 class="table-title">Effect of reference KL loss</h4>
+        <div class="table-wrap">
+          <table class="res-table">
+            <thead><tr><th>Model</th><th>Proofbench@4</th><th>AnswerBench@8</th><th>AIME25@8</th></tr></thead>
+            <tbody>
+              <tr class="row-teacher"><td>SU-01 <span class="tag tag-teacher">teacher</span></td><td>45.00</td><td>77.50</td><td>94.60</td></tr>
+              <tr><td>Intern-S2-Preview <span class="tag tag-base">base</span></td><td>21.70</td><td>76.03</td><td>88.33</td></tr>
+              <tr class="row-opd"><td>OPD + Ref KL</td><td>38.50</td><td>79.10</td><td>95.80</td></tr>
+            </tbody>
+          </table>
         </div>
+        <p class="table-note">OPD + Ref KL: ProofBench@4 21.70 → 38.50; AnswerBench@8 76.03 → 79.10; AIME25@8 88.33 → 95.80.</p>
       </div>
     </div>
 
