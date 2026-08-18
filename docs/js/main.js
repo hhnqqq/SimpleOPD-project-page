@@ -152,7 +152,7 @@
     let W, H, tokens = [];
 
     const WORDS = ["Given", "the", "prob", "lem", "we", "show", "that", "lemma", "proof", "Q.E.D.",
-      "∥", "⊕", "τ", "ρ", "Σ", "π", "y₁", "z₁", "align", "span", "</think>", "<|im_end|>"];
+      "∥", "⊕", "τ", "ρ", "Σ", "π", "y₁", "z₁", "align", "span", "<\u200C/think>", "<\u200C|im_end|\u200C>"];
     const COLORS = ["rgba(56,189,248,", "rgba(129,140,248,", "rgba(167,139,250,", "rgba(244,114,182,", "rgba(251,191,36,"];
 
     function resize() {

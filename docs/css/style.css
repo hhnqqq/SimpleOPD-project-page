@@ -46,7 +46,7 @@ body {
 
 .container { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
 
-.mono { font-family: var(--font-mono); font-size: 0.88em; background: rgba(148, 163, 184, 0.12); padding: 0.15em 0.45em; border-radius: 6px; color: var(--text); }
+.mono { font-family: var(--font-mono); font-size: 0.88em; background: rgba(148, 163, 184, 0.12); padding: 0.15em 0.45em; border-radius: 6px; color: var(--text); font-variant-ligatures: none; }
 
 /* ────────────────────────── NAVBAR ────────────────────────── */
 .nav {
@@ -485,7 +485,8 @@ figcaption em { color: var(--text-faint); }
 .prose strong { color: var(--text); }
 
 .fig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 30px; align-items: start; }
-.fig-grid-1 { grid-template-columns: 1.2fr 1fr; }
+.fig-grid-1 { grid-template-columns: 1.2fr 1fr; align-items: stretch; }
+.fig-grid-1 .table-card { display: flex; flex-direction: column; justify-content: center; }
 .fig-grid .figure-card, .fig-grid-1 .figure-card { margin: 0; }
 .fig-svg { background: #0c1226; border-radius: 12px; }
 .fx-title { font-size: 13.5px; font-weight: 700; fill: #cbd5e1; font-family: var(--font-body); }
